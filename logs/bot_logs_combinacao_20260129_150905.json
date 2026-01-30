@@ -1,0 +1,401 @@
+[
+  {
+    "timestamp": "2026-01-29T15:09:07.389220",
+    "pergunta": "Como funciona um motor a combustão?",
+    "resposta": "Basicamente, o projeto e o princípio de funcionamento do motor de combustão interna. A finalidade dos elementos principais: pistão, biela, . . Ele suga o ar, depois comprime e pulveriza o combustível, acende-o e a explosão empurra o pistão para baixo, então o virabrequim empurra o . Em um motor de combustão interna (ICE), a ignição e a combustão do combustível ocorrem dentro do próprio motor. O motor então converte parcialmente a energia .",
+    "fonte": "google",
+    "status": "success",
+    "tempo_processamento": 1.644,
+    "erro": null,
+    "processo": [
+      {
+        "etapa": "inicio",
+        "timestamp": 4.76837158203125e-07,
+        "detalhes": "Query recebida: Como funciona um motor a combustão?"
+      },
+      {
+        "etapa": "validacao",
+        "timestamp": 3.981590270996094e-05,
+        "status": "ok"
+      },
+      {
+        "etapa": "detectar_intencao",
+        "timestamp": 4.1961669921875e-05,
+        "inicio": true
+      },
+      {
+        "etapa": "detectar_intencao",
+        "timestamp": 0.010696649551391602,
+        "resultado": "conhecimento"
+      },
+      {
+        "etapa": "cache",
+        "timestamp": 0.010725975036621094,
+        "resultado": "miss"
+      },
+      {
+        "etapa": "tipo_pergunta",
+        "timestamp": 0.010726451873779297,
+        "inicio": true
+      },
+      {
+        "etapa": "tipo_pergunta",
+        "timestamp": 0.018604516983032227,
+        "resultado": "como"
+      },
+      {
+        "etapa": "criar_query",
+        "timestamp": 0.01871180534362793,
+        "inicio": true
+      },
+      {
+        "etapa": "criar_query",
+        "timestamp": 0.025346755981445312,
+        "query_pt": "Como funciona um motor a combustão?"
+      },
+      {
+        "etapa": "detectar_idioma",
+        "timestamp": 0.02739858627319336,
+        "idioma": "pt"
+      },
+      {
+        "etapa": "traduzir_query",
+        "timestamp": 0.11082029342651367,
+        "query_en": "How does a combustion engine work?"
+      },
+      {
+        "etapa": "buscar_apis",
+        "timestamp": 0.11085939407348633,
+        "inicio": true
+      },
+      {
+        "etapa": "buscar_apis",
+        "timestamp": 1.5535879135131836,
+        "resultados": {
+          "wolfram": {
+            "status": "vazio"
+          },
+          "google": {
+            "status": "sucesso",
+            "tamanho": 478,
+            "preview": "Jan 7, 2022 ... The design and principle of operation of the internal combustion engine. The purpose"
+          },
+          "duckduckgo": {
+            "status": "vazio"
+          },
+          "wikipedia": {
+            "status": "vazio"
+          }
+        }
+      },
+      {
+        "etapa": "traduzir_resultados",
+        "timestamp": 1.5535888671875,
+        "inicio": true
+      },
+      {
+        "etapa": "traduzir_resultados",
+        "timestamp": 1.6415019035339355,
+        "fonte": "google",
+        "status": "ok",
+        "preview_pt": "7 de janeiro de 2022 ... O projeto e o princípio de funcionamento do motor de combustão interna. A f"
+      },
+      {
+        "etapa": "combinar_respostas",
+        "timestamp": 1.641505479812622,
+        "inicio": true
+      },
+      {
+        "etapa": "combinar_respostas",
+        "timestamp": 1.6439523696899414,
+        "fonte_principal": "google",
+        "sucesso": true
+      },
+      {
+        "etapa": "formatar_resposta",
+        "timestamp": 1.6439547538757324,
+        "inicio": true
+      },
+      {
+        "etapa": "formatar_resposta",
+        "timestamp": 1.64406156539917,
+        "resposta_final": "Basicamente, o projeto e o princípio de funcionamento do motor de combustão interna. A finalidade do"
+      },
+      {
+        "etapa": "salvar_cache",
+        "timestamp": 1.6441872119903564
+      },
+      {
+        "etapa": "fim",
+        "timestamp": 1.6441905498504639,
+        "detalhes": "Processamento concluído"
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-01-29T15:09:09.565684",
+    "pergunta": "Por que o mar é salgado?",
+    "resposta": "Isso acontece porque o sal no oceano vem de duas fontes: escoamento da terra e aberturas no fundo do mar. As rochas terrestres são a principal fonte de sais dissolvidos na água do mar. . Ao longo de milhões de anos, a água dissolveu sais do solo. Os rios carregaram essa água para o mar, onde a água pura evaporou . O sal no mar, ou salinidade do oceano, é causado principalmente pela chuva que leva íons minerais da terra para a água. O dióxido de carbono no ar se dissolve em .",
+    "fonte": "google",
+    "status": "success",
+    "tempo_processamento": 2.175,
+    "erro": null,
+    "processo": [
+      {
+        "etapa": "inicio",
+        "timestamp": 7.152557373046875e-07,
+        "detalhes": "Query recebida: Por que o mar é salgado?"
+      },
+      {
+        "etapa": "validacao",
+        "timestamp": 6.365776062011719e-05,
+        "status": "ok"
+      },
+      {
+        "etapa": "detectar_intencao",
+        "timestamp": 6.508827209472656e-05,
+        "inicio": true
+      },
+      {
+        "etapa": "detectar_intencao",
+        "timestamp": 0.009790182113647461,
+        "resultado": "conhecimento"
+      },
+      {
+        "etapa": "cache",
+        "timestamp": 0.009814262390136719,
+        "resultado": "miss"
+      },
+      {
+        "etapa": "tipo_pergunta",
+        "timestamp": 0.009814977645874023,
+        "inicio": true
+      },
+      {
+        "etapa": "tipo_pergunta",
+        "timestamp": 0.01681971549987793,
+        "resultado": "porque"
+      },
+      {
+        "etapa": "criar_query",
+        "timestamp": 0.01692652702331543,
+        "inicio": true
+      },
+      {
+        "etapa": "criar_query",
+        "timestamp": 0.02324986457824707,
+        "query_pt": "Por que o mar é salgado?"
+      },
+      {
+        "etapa": "detectar_idioma",
+        "timestamp": 0.025476694107055664,
+        "idioma": "pt"
+      },
+      {
+        "etapa": "traduzir_query",
+        "timestamp": 0.3110501766204834,
+        "query_en": "Why is the sea salty?"
+      },
+      {
+        "etapa": "buscar_apis",
+        "timestamp": 0.311079740524292,
+        "inicio": true
+      },
+      {
+        "etapa": "buscar_apis",
+        "timestamp": 1.6990931034088135,
+        "resultados": {
+          "wolfram": {
+            "status": "vazio"
+          },
+          "google": {
+            "status": "sucesso",
+            "tamanho": 485,
+            "preview": "Feb 21, 2025 ... Salt in the ocean comes from two sources: runoff from the land and openings in the "
+          },
+          "duckduckgo": {
+            "status": "vazio"
+          },
+          "wikipedia": {
+            "status": "vazio"
+          }
+        }
+      },
+      {
+        "etapa": "traduzir_resultados",
+        "timestamp": 1.699094533920288,
+        "inicio": true
+      },
+      {
+        "etapa": "traduzir_resultados",
+        "timestamp": 2.172504425048828,
+        "fonte": "google",
+        "status": "ok",
+        "preview_pt": "21 de fevereiro de 2025… O sal no oceano vem de duas fontes: escoamento da terra e aberturas no fund"
+      },
+      {
+        "etapa": "combinar_respostas",
+        "timestamp": 2.172508716583252,
+        "inicio": true
+      },
+      {
+        "etapa": "combinar_respostas",
+        "timestamp": 2.175203800201416,
+        "fonte_principal": "google",
+        "sucesso": true
+      },
+      {
+        "etapa": "formatar_resposta",
+        "timestamp": 2.1752052307128906,
+        "inicio": true
+      },
+      {
+        "etapa": "formatar_resposta",
+        "timestamp": 2.1753311157226562,
+        "resposta_final": "Isso acontece porque o sal no oceano vem de duas fontes: escoamento da terra e aberturas no fundo do"
+      },
+      {
+        "etapa": "salvar_cache",
+        "timestamp": 2.175455331802368
+      },
+      {
+        "etapa": "fim",
+        "timestamp": 2.1754586696624756,
+        "detalhes": "Processamento concluído"
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-01-29T15:09:12.419636",
+    "pergunta": "Como surgiu o universo?",
+    "resposta": "Basicamente, não há evidências de que em algum momento não houve nada. O Big Bang explica simplesmente como eram os primeiros momentos do Universo . . Cerca de 14 bilhões de anos atrás, o universo surgiu espontaneamente do vazio. Decorre naturalmente de duas teorias bem conhecidas da ciência: . . Como nós (o universo) viemos a existir? Como uma singularidade levou. a ser a causa da existência do nosso universo?",
+    "fonte": "google",
+    "status": "success",
+    "tempo_processamento": 2.852,
+    "erro": null,
+    "processo": [
+      {
+        "etapa": "inicio",
+        "timestamp": 4.76837158203125e-07,
+        "detalhes": "Query recebida: Como surgiu o universo?"
+      },
+      {
+        "etapa": "validacao",
+        "timestamp": 7.581710815429688e-05,
+        "status": "ok"
+      },
+      {
+        "etapa": "detectar_intencao",
+        "timestamp": 7.700920104980469e-05,
+        "inicio": true
+      },
+      {
+        "etapa": "detectar_intencao",
+        "timestamp": 0.0076007843017578125,
+        "resultado": "conhecimento"
+      },
+      {
+        "etapa": "cache",
+        "timestamp": 0.007618427276611328,
+        "resultado": "miss"
+      },
+      {
+        "etapa": "tipo_pergunta",
+        "timestamp": 0.007619380950927734,
+        "inicio": true
+      },
+      {
+        "etapa": "tipo_pergunta",
+        "timestamp": 0.014858007431030273,
+        "resultado": "como"
+      },
+      {
+        "etapa": "criar_query",
+        "timestamp": 0.01497030258178711,
+        "inicio": true
+      },
+      {
+        "etapa": "criar_query",
+        "timestamp": 0.021212100982666016,
+        "query_pt": "Como surgiu o universo?"
+      },
+      {
+        "etapa": "detectar_idioma",
+        "timestamp": 0.030484914779663086,
+        "idioma": "pt"
+      },
+      {
+        "etapa": "traduzir_query",
+        "timestamp": 0.7298634052276611,
+        "query_en": "How did the universe come into being?"
+      },
+      {
+        "etapa": "buscar_apis",
+        "timestamp": 0.7298972606658936,
+        "inicio": true
+      },
+      {
+        "etapa": "buscar_apis",
+        "timestamp": 1.9281504154205322,
+        "resultados": {
+          "wolfram": {
+            "status": "vazio"
+          },
+          "google": {
+            "status": "sucesso",
+            "tamanho": 476,
+            "preview": "Nov 20, 2022 ... There's no evidence that at any point in time there was nothing. The Big Bang simpl"
+          },
+          "duckduckgo": {
+            "status": "vazio"
+          },
+          "wikipedia": {
+            "status": "vazio"
+          }
+        }
+      },
+      {
+        "etapa": "traduzir_resultados",
+        "timestamp": 1.9281516075134277,
+        "inicio": true
+      },
+      {
+        "etapa": "traduzir_resultados",
+        "timestamp": 2.849517583847046,
+        "fonte": "google",
+        "status": "ok",
+        "preview_pt": "20 de novembro de 2022... Não há evidências de que em algum momento não houve nada. O Big Bang expli"
+      },
+      {
+        "etapa": "combinar_respostas",
+        "timestamp": 2.849520206451416,
+        "inicio": true
+      },
+      {
+        "etapa": "combinar_respostas",
+        "timestamp": 2.851600170135498,
+        "fonte_principal": "google",
+        "sucesso": true
+      },
+      {
+        "etapa": "formatar_resposta",
+        "timestamp": 2.8516018390655518,
+        "inicio": true
+      },
+      {
+        "etapa": "formatar_resposta",
+        "timestamp": 2.851686477661133,
+        "resposta_final": "Basicamente, não há evidências de que em algum momento não houve nada. O Big Bang explica simplesmen"
+      },
+      {
+        "etapa": "salvar_cache",
+        "timestamp": 2.851780652999878
+      },
+      {
+        "etapa": "fim",
+        "timestamp": 2.851783275604248,
+        "detalhes": "Processamento concluído"
+      }
+    ]
+  }
+]

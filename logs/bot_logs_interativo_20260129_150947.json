@@ -1,0 +1,185 @@
+[
+  {
+    "timestamp": "2026-01-29T15:09:54.134711",
+    "pergunta": "Ola, tudo bem?",
+    "resposta": "Tudo ótimo por aqui! Como posso ajudar?",
+    "fonte": "status",
+    "status": "success",
+    "tempo_processamento": 0.006,
+    "erro": null,
+    "processo": [
+      {
+        "etapa": "inicio",
+        "timestamp": 1.9073486328125e-06,
+        "detalhes": "Query recebida: Ola, tudo bem?"
+      },
+      {
+        "etapa": "validacao",
+        "timestamp": 0.0001342296600341797,
+        "status": "ok"
+      },
+      {
+        "etapa": "detectar_intencao",
+        "timestamp": 0.0001361370086669922,
+        "inicio": true
+      },
+      {
+        "etapa": "detectar_intencao",
+        "timestamp": 0.006145954132080078,
+        "resultado": "status"
+      },
+      {
+        "etapa": "resposta_direta",
+        "timestamp": 0.006152153015136719,
+        "intencao": "status"
+      },
+      {
+        "etapa": "fim",
+        "timestamp": 0.006153583526611328,
+        "detalhes": "Processamento concluído"
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-01-29T15:10:48.863590",
+    "pergunta": "Quantos países existem?",
+    "resposta": "Especificamente, varia de acordo com como você define um país. Existem definições geralmente aceitas, razão pela qual a ONU tem 195 países em . Esta seção fornece informações de referência histórica sobre os países com os quais os Estados Unidos mantiveram relações diplomáticas. Existem 195 países no mundo hoje. Este total compreende 193 países que são estados membros das Nações Unidas e 2 países que não são membros .",
+    "fonte": "google",
+    "status": "success",
+    "tempo_processamento": 1.944,
+    "erro": null,
+    "processo": [
+      {
+        "etapa": "inicio",
+        "timestamp": 1.430511474609375e-06,
+        "detalhes": "Query recebida: Quantos países existem?"
+      },
+      {
+        "etapa": "validacao",
+        "timestamp": 0.00014710426330566406,
+        "status": "ok"
+      },
+      {
+        "etapa": "detectar_intencao",
+        "timestamp": 0.00014925003051757812,
+        "inicio": true
+      },
+      {
+        "etapa": "detectar_intencao",
+        "timestamp": 0.009103536605834961,
+        "resultado": "conhecimento"
+      },
+      {
+        "etapa": "cache",
+        "timestamp": 0.009123802185058594,
+        "resultado": "miss"
+      },
+      {
+        "etapa": "tipo_pergunta",
+        "timestamp": 0.009124040603637695,
+        "inicio": true
+      },
+      {
+        "etapa": "tipo_pergunta",
+        "timestamp": 0.01568007469177246,
+        "resultado": "quanto"
+      },
+      {
+        "etapa": "criar_query",
+        "timestamp": 0.01579451560974121,
+        "inicio": true
+      },
+      {
+        "etapa": "criar_query",
+        "timestamp": 0.02214193344116211,
+        "query_pt": "Quantos países existem?"
+      },
+      {
+        "etapa": "detectar_idioma",
+        "timestamp": 0.02214527130126953,
+        "idioma": "pt"
+      },
+      {
+        "etapa": "traduzir_query",
+        "timestamp": 0.7687735557556152,
+        "query_en": "How many countries are there?"
+      },
+      {
+        "etapa": "buscar_apis",
+        "timestamp": 0.7688078880310059,
+        "inicio": true
+      },
+      {
+        "etapa": "buscar_apis",
+        "timestamp": 1.1402878761291504,
+        "resultados": {
+          "wolfram": {
+            "status": "sucesso",
+            "tamanho": 3,
+            "preview": "206"
+          },
+          "google": {
+            "status": "sucesso",
+            "tamanho": 456,
+            "preview": "May 8, 2025 ... Specifically, it varies based on how you define a country. There are generally agree"
+          },
+          "duckduckgo": {
+            "status": "vazio"
+          },
+          "wikipedia": {
+            "status": "vazio"
+          }
+        }
+      },
+      {
+        "etapa": "traduzir_resultados",
+        "timestamp": 1.140289306640625,
+        "inicio": true
+      },
+      {
+        "etapa": "traduzir_resultados",
+        "timestamp": 1.2596919536590576,
+        "fonte": "wolfram",
+        "status": "ok",
+        "preview_pt": "206"
+      },
+      {
+        "etapa": "traduzir_resultados",
+        "timestamp": 1.9349086284637451,
+        "fonte": "google",
+        "status": "ok",
+        "preview_pt": "8 de maio de 2025... Especificamente, varia de acordo com como você define um país. Existem definiçõ"
+      },
+      {
+        "etapa": "combinar_respostas",
+        "timestamp": 1.9349119663238525,
+        "inicio": true
+      },
+      {
+        "etapa": "combinar_respostas",
+        "timestamp": 1.9429855346679688,
+        "fonte_principal": "google",
+        "sucesso": true
+      },
+      {
+        "etapa": "formatar_resposta",
+        "timestamp": 1.942988634109497,
+        "inicio": true
+      },
+      {
+        "etapa": "formatar_resposta",
+        "timestamp": 1.9434685707092285,
+        "resposta_final": "Especificamente, varia de acordo com como você define um país. Existem definições geralmente aceitas"
+      },
+      {
+        "etapa": "salvar_cache",
+        "timestamp": 1.9442241191864014
+      },
+      {
+        "etapa": "fim",
+        "timestamp": 1.944228172302246,
+        "detalhes": "Processamento concluído"
+      }
+    ]
+  }
+]

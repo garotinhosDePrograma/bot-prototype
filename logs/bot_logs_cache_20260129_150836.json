@@ -1,0 +1,194 @@
+[
+  {
+    "timestamp": "2026-01-29T15:08:37.729811",
+    "pergunta": "Qual a capital do Brasil? [1ª tentativa]",
+    "resposta": "A atual capital do Brasil, desde sua construção em 1960, é Brasília. O Rio de Janeiro foi a capital do país entre 1763 e 1960. A cidade de Salvador serviu como sede da administração colonial portuguesa no Brasil durante os primeiros dois séculos e é geralmente chamada de primeira capital do Brasil.",
+    "fonte": "duckduckgo",
+    "status": "success",
+    "tempo_processamento": 1.016,
+    "erro": null,
+    "processo": [
+      {
+        "etapa": "inicio",
+        "timestamp": 7.152557373046875e-07,
+        "detalhes": "Query recebida: Qual a capital do Brasil?"
+      },
+      {
+        "etapa": "validacao",
+        "timestamp": 3.6716461181640625e-05,
+        "status": "ok"
+      },
+      {
+        "etapa": "detectar_intencao",
+        "timestamp": 3.8623809814453125e-05,
+        "inicio": true
+      },
+      {
+        "etapa": "detectar_intencao",
+        "timestamp": 0.00618433952331543,
+        "resultado": "conhecimento"
+      },
+      {
+        "etapa": "cache",
+        "timestamp": 0.006203651428222656,
+        "resultado": "miss"
+      },
+      {
+        "etapa": "tipo_pergunta",
+        "timestamp": 0.006204128265380859,
+        "inicio": true
+      },
+      {
+        "etapa": "tipo_pergunta",
+        "timestamp": 0.011563539505004883,
+        "resultado": "qual"
+      },
+      {
+        "etapa": "criar_query",
+        "timestamp": 0.011670827865600586,
+        "inicio": true
+      },
+      {
+        "etapa": "criar_query",
+        "timestamp": 0.017680644989013672,
+        "query_pt": "Qual a capital do Brasil?"
+      },
+      {
+        "etapa": "detectar_idioma",
+        "timestamp": 0.028310775756835938,
+        "idioma": "pt"
+      },
+      {
+        "etapa": "traduzir_query",
+        "timestamp": 0.13123297691345215,
+        "query_en": "What is the capital of Brazil?"
+      },
+      {
+        "etapa": "buscar_apis",
+        "timestamp": 0.13129925727844238,
+        "inicio": true
+      },
+      {
+        "etapa": "buscar_apis",
+        "timestamp": 0.705477237701416,
+        "resultados": {
+          "wolfram": {
+            "status": "sucesso",
+            "tamanho": 16,
+            "preview": "Brasília, Brazil"
+          },
+          "google": {
+            "status": "sucesso",
+            "tamanho": 500,
+            "preview": "Jul 1, 2024 ... Brasília was built in the 1950s to be Brazil's capital, Rio de Janeiro is centuries "
+          },
+          "duckduckgo": {
+            "status": "sucesso",
+            "tamanho": 313,
+            "preview": "The current capital of Brazil, since its construction in 1960, is Brasília. Rio de Janeiro was the c"
+          },
+          "wikipedia": {
+            "status": "vazio"
+          }
+        }
+      },
+      {
+        "etapa": "traduzir_resultados",
+        "timestamp": 0.7054784297943115,
+        "inicio": true
+      },
+      {
+        "etapa": "traduzir_resultados",
+        "timestamp": 0.7978136539459229,
+        "fonte": "wolfram",
+        "status": "ok",
+        "preview_pt": "Brasília, Brasil"
+      },
+      {
+        "etapa": "traduzir_resultados",
+        "timestamp": 0.8949787616729736,
+        "fonte": "google",
+        "status": "ok",
+        "preview_pt": "1º de julho de 2024 ... Brasília foi construída na década de 1950 para ser a capital do Brasil, o Ri"
+      },
+      {
+        "etapa": "traduzir_resultados",
+        "timestamp": 1.0035760402679443,
+        "fonte": "duckduckgo",
+        "status": "ok",
+        "preview_pt": "A atual capital do Brasil, desde sua construção em 1960, é Brasília. O Rio de Janeiro foi a capital "
+      },
+      {
+        "etapa": "combinar_respostas",
+        "timestamp": 1.003580093383789,
+        "inicio": true
+      },
+      {
+        "etapa": "combinar_respostas",
+        "timestamp": 1.014744758605957,
+        "fonte_principal": "duckduckgo",
+        "sucesso": true
+      },
+      {
+        "etapa": "formatar_resposta",
+        "timestamp": 1.0147476196289062,
+        "inicio": true
+      },
+      {
+        "etapa": "formatar_resposta",
+        "timestamp": 1.0148241519927979,
+        "resposta_final": "A atual capital do Brasil, desde sua construção em 1960, é Brasília. O Rio de Janeiro foi a capital "
+      },
+      {
+        "etapa": "salvar_cache",
+        "timestamp": 1.0157852172851562
+      },
+      {
+        "etapa": "fim",
+        "timestamp": 1.0164108276367188,
+        "detalhes": "Processamento concluído"
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-01-29T15:08:37.744897",
+    "pergunta": "Qual a capital do Brasil? [2ª tentativa - cache]",
+    "resposta": "A atual capital do Brasil, desde sua construção em 1960, é Brasília. O Rio de Janeiro foi a capital do país entre 1763 e 1960. A cidade de Salvador serviu como sede da administração colonial portuguesa no Brasil durante os primeiros dois séculos e é geralmente chamada de primeira capital do Brasil.",
+    "fonte": "duckduckgo",
+    "status": "success",
+    "tempo_processamento": 0.013,
+    "erro": null,
+    "processo": [
+      {
+        "etapa": "inicio",
+        "timestamp": 7.152557373046875e-07,
+        "detalhes": "Query recebida: Qual a capital do Brasil?"
+      },
+      {
+        "etapa": "validacao",
+        "timestamp": 0.00023746490478515625,
+        "status": "ok"
+      },
+      {
+        "etapa": "detectar_intencao",
+        "timestamp": 0.00023937225341796875,
+        "inicio": true
+      },
+      {
+        "etapa": "detectar_intencao",
+        "timestamp": 0.012607336044311523,
+        "resultado": "conhecimento"
+      },
+      {
+        "etapa": "cache",
+        "timestamp": 0.013304710388183594,
+        "resultado": "hit"
+      },
+      {
+        "etapa": "fim",
+        "timestamp": 0.013314962387084961,
+        "detalhes": "Processamento concluído"
+      }
+    ]
+  }
+]

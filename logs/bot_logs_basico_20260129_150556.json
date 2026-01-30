@@ -1,0 +1,735 @@
+[
+  {
+    "timestamp": "2026-01-29T15:05:56.271721",
+    "pergunta": "Oi, tudo bem?",
+    "resposta": "Estou de boa, e você?",
+    "fonte": "status",
+    "status": "success",
+    "tempo_processamento": 0.01,
+    "erro": null,
+    "processo": [
+      {
+        "etapa": "inicio",
+        "timestamp": 9.5367431640625e-07,
+        "detalhes": "Query recebida: Oi, tudo bem?"
+      },
+      {
+        "etapa": "validacao",
+        "timestamp": 7.343292236328125e-05,
+        "status": "ok"
+      },
+      {
+        "etapa": "detectar_intencao",
+        "timestamp": 7.62939453125e-05,
+        "inicio": true
+      },
+      {
+        "etapa": "detectar_intencao",
+        "timestamp": 0.00976109504699707,
+        "resultado": "status"
+      },
+      {
+        "etapa": "resposta_direta",
+        "timestamp": 0.009770631790161133,
+        "intencao": "status"
+      },
+      {
+        "etapa": "fim",
+        "timestamp": 0.009772300720214844,
+        "detalhes": "Processamento concluído"
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-01-29T15:05:57.649610",
+    "pergunta": "Qual a capital da França?",
+    "resposta": "Paris é a capital e a cidade mais populosa da França. Situada às margens do rio Sena, no norte do país, fica no centro da Île-de-France . Paris é a capital da França, o maior país da Europa com 550.000 km2 (65 milhões de habitantes). Paris tem 2,234 milhões de habitantes no final de 2011. Esta é uma lista cronológica das capitais da França. A capital da França é Paris desde a sua libertação em 1944.",
+    "fonte": "google",
+    "status": "success",
+    "tempo_processamento": 1.377,
+    "erro": null,
+    "processo": [
+      {
+        "etapa": "inicio",
+        "timestamp": 7.152557373046875e-07,
+        "detalhes": "Query recebida: Qual a capital da França?"
+      },
+      {
+        "etapa": "validacao",
+        "timestamp": 8.749961853027344e-05,
+        "status": "ok"
+      },
+      {
+        "etapa": "detectar_intencao",
+        "timestamp": 8.893013000488281e-05,
+        "inicio": true
+      },
+      {
+        "etapa": "detectar_intencao",
+        "timestamp": 0.008296489715576172,
+        "resultado": "conhecimento"
+      },
+      {
+        "etapa": "cache",
+        "timestamp": 0.008342742919921875,
+        "resultado": "miss"
+      },
+      {
+        "etapa": "tipo_pergunta",
+        "timestamp": 0.008343219757080078,
+        "inicio": true
+      },
+      {
+        "etapa": "tipo_pergunta",
+        "timestamp": 0.017154216766357422,
+        "resultado": "qual"
+      },
+      {
+        "etapa": "criar_query",
+        "timestamp": 0.01869678497314453,
+        "inicio": true
+      },
+      {
+        "etapa": "criar_query",
+        "timestamp": 0.027716875076293945,
+        "query_pt": "Qual a capital da França?"
+      },
+      {
+        "etapa": "detectar_idioma",
+        "timestamp": 0.4537990093231201,
+        "idioma": "pt"
+      },
+      {
+        "etapa": "traduzir_query",
+        "timestamp": 0.5430710315704346,
+        "query_en": "What is the capital of France?"
+      },
+      {
+        "etapa": "buscar_apis",
+        "timestamp": 0.543102502822876,
+        "inicio": true
+      },
+      {
+        "etapa": "buscar_apis",
+        "timestamp": 1.1664886474609375,
+        "resultados": {
+          "wolfram": {
+            "status": "sucesso",
+            "tamanho": 28,
+            "preview": "Paris, Île-de-France, France"
+          },
+          "google": {
+            "status": "sucesso",
+            "tamanho": 428,
+            "preview": "Paris is the capital and most populous city of France. Situated on the Seine River, in the north of "
+          },
+          "duckduckgo": {
+            "status": "vazio"
+          },
+          "wikipedia": {
+            "status": "vazio"
+          }
+        }
+      },
+      {
+        "etapa": "traduzir_resultados",
+        "timestamp": 1.166490077972412,
+        "inicio": true
+      },
+      {
+        "etapa": "traduzir_resultados",
+        "timestamp": 1.2766227722167969,
+        "fonte": "wolfram",
+        "status": "ok",
+        "preview_pt": "Paris, Ilha de França, França"
+      },
+      {
+        "etapa": "traduzir_resultados",
+        "timestamp": 1.370283842086792,
+        "fonte": "google",
+        "status": "ok",
+        "preview_pt": "Paris é a capital e a cidade mais populosa da França. Situada às margens do rio Sena, no norte do pa"
+      },
+      {
+        "etapa": "combinar_respostas",
+        "timestamp": 1.3702924251556396,
+        "inicio": true
+      },
+      {
+        "etapa": "combinar_respostas",
+        "timestamp": 1.3770396709442139,
+        "fonte_principal": "google",
+        "sucesso": true
+      },
+      {
+        "etapa": "formatar_resposta",
+        "timestamp": 1.3770415782928467,
+        "inicio": true
+      },
+      {
+        "etapa": "formatar_resposta",
+        "timestamp": 1.377133846282959,
+        "resposta_final": "Paris é a capital e a cidade mais populosa da França. Situada às margens do rio Sena, no norte do pa"
+      },
+      {
+        "etapa": "salvar_cache",
+        "timestamp": 1.3772680759429932
+      },
+      {
+        "etapa": "fim",
+        "timestamp": 1.3772718906402588,
+        "detalhes": "Processamento concluído"
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-01-29T15:05:58.971572",
+    "pergunta": "Como funciona a fotossíntese?",
+    "resposta": "Basicamente, fotossíntese é o processo de criação de açúcar e oxigênio a partir de dióxido de carbono, água e luz solar. Isso acontece por meio de uma longa série de reações químicas. A fotossíntese é um sistema de processos biológicos pelo qual organismos autotróficos portadores de fotopigmentos, como a maioria das plantas, algas e cianobactérias, . . A fotossíntese é o processo pelo qual as plantas usam luz solar, água e dióxido de carbono para criar oxigênio e energia na forma de açúcar.",
+    "fonte": "google",
+    "status": "success",
+    "tempo_processamento": 1.321,
+    "erro": null,
+    "processo": [
+      {
+        "etapa": "inicio",
+        "timestamp": 4.76837158203125e-07,
+        "detalhes": "Query recebida: Como funciona a fotossíntese?"
+      },
+      {
+        "etapa": "validacao",
+        "timestamp": 6.628036499023438e-05,
+        "status": "ok"
+      },
+      {
+        "etapa": "detectar_intencao",
+        "timestamp": 6.818771362304688e-05,
+        "inicio": true
+      },
+      {
+        "etapa": "detectar_intencao",
+        "timestamp": 0.005214214324951172,
+        "resultado": "conhecimento"
+      },
+      {
+        "etapa": "cache",
+        "timestamp": 0.005236148834228516,
+        "resultado": "miss"
+      },
+      {
+        "etapa": "tipo_pergunta",
+        "timestamp": 0.005236625671386719,
+        "inicio": true
+      },
+      {
+        "etapa": "tipo_pergunta",
+        "timestamp": 0.010444879531860352,
+        "resultado": "como"
+      },
+      {
+        "etapa": "criar_query",
+        "timestamp": 0.010512351989746094,
+        "inicio": true
+      },
+      {
+        "etapa": "criar_query",
+        "timestamp": 0.014562606811523438,
+        "query_pt": "Como funciona a fotossíntese?"
+      },
+      {
+        "etapa": "detectar_idioma",
+        "timestamp": 0.02590012550354004,
+        "idioma": "pt"
+      },
+      {
+        "etapa": "traduzir_query",
+        "timestamp": 0.11414718627929688,
+        "query_en": "How does photosynthesis work?"
+      },
+      {
+        "etapa": "buscar_apis",
+        "timestamp": 0.11417222023010254,
+        "inicio": true
+      },
+      {
+        "etapa": "buscar_apis",
+        "timestamp": 1.2242796421051025,
+        "resultados": {
+          "wolfram": {
+            "status": "vazio"
+          },
+          "google": {
+            "status": "sucesso",
+            "tamanho": 479,
+            "preview": "Oct 28, 2020 ... Photosynthesis is the process of creating sugar and oxygen from carbon dioxide, wat"
+          },
+          "duckduckgo": {
+            "status": "vazio"
+          },
+          "wikipedia": {
+            "status": "vazio"
+          }
+        }
+      },
+      {
+        "etapa": "traduzir_resultados",
+        "timestamp": 1.2242810726165771,
+        "inicio": true
+      },
+      {
+        "etapa": "traduzir_resultados",
+        "timestamp": 1.3182976245880127,
+        "fonte": "google",
+        "status": "ok",
+        "preview_pt": "28 de outubro de 2020… Fotossíntese é o processo de criação de açúcar e oxigênio a partir de dióxido"
+      },
+      {
+        "etapa": "combinar_respostas",
+        "timestamp": 1.3183021545410156,
+        "inicio": true
+      },
+      {
+        "etapa": "combinar_respostas",
+        "timestamp": 1.320450782775879,
+        "fonte_principal": "google",
+        "sucesso": true
+      },
+      {
+        "etapa": "formatar_resposta",
+        "timestamp": 1.3204519748687744,
+        "inicio": true
+      },
+      {
+        "etapa": "formatar_resposta",
+        "timestamp": 1.32053804397583,
+        "resposta_final": "Basicamente, fotossíntese é o processo de criação de açúcar e oxigênio a partir de dióxido de carbon"
+      },
+      {
+        "etapa": "salvar_cache",
+        "timestamp": 1.3206138610839844
+      },
+      {
+        "etapa": "fim",
+        "timestamp": 1.3206205368041992,
+        "detalhes": "Processamento concluído"
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-01-29T15:05:59.889928",
+    "pergunta": "Por que o céu é azul?",
+    "resposta": "Isso acontece porque a luz azul é mais espalhada do que as outras cores porque viaja em ondas menores e mais curtas. É por isso que vemos um céu azul na maior parte do tempo. . Como o sol é intenso, a dispersão proporciona muito azul no céu. Um céu diurno claro e sem nuvens é azul porque as moléculas no ar espalham mais a luz azul do Sol do que a luz vermelha. A cor azul do céu é resultado do efeito do espalhamento Rayleigh. A luz azul de comprimento de onda mais curto é mais fortemente espalhada na atmosfera da Terra do que a luz vermelha de comprimento de onda mais longo. Como resultado, o olho humano percebe a cor azul ao olhar para o céu.",
+    "fonte": "google+wolfram",
+    "status": "success",
+    "tempo_processamento": 0.917,
+    "erro": null,
+    "processo": [
+      {
+        "etapa": "inicio",
+        "timestamp": 7.152557373046875e-07,
+        "detalhes": "Query recebida: Por que o céu é azul?"
+      },
+      {
+        "etapa": "validacao",
+        "timestamp": 6.413459777832031e-05,
+        "status": "ok"
+      },
+      {
+        "etapa": "detectar_intencao",
+        "timestamp": 6.556510925292969e-05,
+        "inicio": true
+      },
+      {
+        "etapa": "detectar_intencao",
+        "timestamp": 0.005669355392456055,
+        "resultado": "conhecimento"
+      },
+      {
+        "etapa": "cache",
+        "timestamp": 0.005709171295166016,
+        "resultado": "miss"
+      },
+      {
+        "etapa": "tipo_pergunta",
+        "timestamp": 0.005710124969482422,
+        "inicio": true
+      },
+      {
+        "etapa": "tipo_pergunta",
+        "timestamp": 0.011410713195800781,
+        "resultado": "porque"
+      },
+      {
+        "etapa": "criar_query",
+        "timestamp": 0.011497259140014648,
+        "inicio": true
+      },
+      {
+        "etapa": "criar_query",
+        "timestamp": 0.01773238182067871,
+        "query_pt": "Por que o céu é azul?"
+      },
+      {
+        "etapa": "detectar_idioma",
+        "timestamp": 0.020532846450805664,
+        "idioma": "pt"
+      },
+      {
+        "etapa": "traduzir_query",
+        "timestamp": 0.10531783103942871,
+        "query_en": "Why is the sky blue?"
+      },
+      {
+        "etapa": "buscar_apis",
+        "timestamp": 0.10534811019897461,
+        "inicio": true
+      },
+      {
+        "etapa": "buscar_apis",
+        "timestamp": 0.6809742450714111,
+        "resultados": {
+          "wolfram": {
+            "status": "sucesso",
+            "tamanho": 263,
+            "preview": "The sky's blue color is a result of the effect of Rayleigh scattering. Shorter-wavelength blue light"
+          },
+          "google": {
+            "status": "sucesso",
+            "tamanho": 436,
+            "preview": "Blue light is scattered more than the other colors because it travels as shorter, smaller waves. Thi"
+          },
+          "duckduckgo": {
+            "status": "vazio"
+          },
+          "wikipedia": {
+            "status": "vazio"
+          }
+        }
+      },
+      {
+        "etapa": "traduzir_resultados",
+        "timestamp": 0.6809759140014648,
+        "inicio": true
+      },
+      {
+        "etapa": "traduzir_resultados",
+        "timestamp": 0.7730331420898438,
+        "fonte": "wolfram",
+        "status": "ok",
+        "preview_pt": "A cor azul do céu é resultado do efeito do espalhamento Rayleigh. A luz azul de comprimento de onda "
+      },
+      {
+        "etapa": "traduzir_resultados",
+        "timestamp": 0.89015793800354,
+        "fonte": "google",
+        "status": "ok",
+        "preview_pt": "A luz azul é mais espalhada do que as outras cores porque viaja em ondas menores e mais curtas. É po"
+      },
+      {
+        "etapa": "combinar_respostas",
+        "timestamp": 0.8901617527008057,
+        "inicio": true
+      },
+      {
+        "etapa": "combinar_respostas",
+        "timestamp": 0.9167430400848389,
+        "fonte_principal": "google+wolfram",
+        "sucesso": true
+      },
+      {
+        "etapa": "formatar_resposta",
+        "timestamp": 0.9167454242706299,
+        "inicio": true
+      },
+      {
+        "etapa": "formatar_resposta",
+        "timestamp": 0.9168856143951416,
+        "resposta_final": "Isso acontece porque a luz azul é mais espalhada do que as outras cores porque viaja em ondas menore"
+      },
+      {
+        "etapa": "salvar_cache",
+        "timestamp": 0.9169819355010986
+      },
+      {
+        "etapa": "fim",
+        "timestamp": 0.916985034942627,
+        "detalhes": "Processamento concluído"
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-01-29T15:06:02.600006",
+    "pergunta": "Quem foi Albert Einstein?",
+    "resposta": "Albert Einstein ( ) foi um físico teórico alemão mais conhecido por desenvolver a teoria da relatividade. Einstein também fez contribuições importantes para a mecânica quântica.",
+    "fonte": "wolfram",
+    "status": "success",
+    "tempo_processamento": 2.709,
+    "erro": null,
+    "processo": [
+      {
+        "etapa": "inicio",
+        "timestamp": 7.152557373046875e-07,
+        "detalhes": "Query recebida: Quem foi Albert Einstein?"
+      },
+      {
+        "etapa": "validacao",
+        "timestamp": 5.507469177246094e-05,
+        "status": "ok"
+      },
+      {
+        "etapa": "detectar_intencao",
+        "timestamp": 5.6743621826171875e-05,
+        "inicio": true
+      },
+      {
+        "etapa": "detectar_intencao",
+        "timestamp": 0.0064814090728759766,
+        "resultado": "conhecimento"
+      },
+      {
+        "etapa": "cache",
+        "timestamp": 0.006497621536254883,
+        "resultado": "miss"
+      },
+      {
+        "etapa": "tipo_pergunta",
+        "timestamp": 0.006497859954833984,
+        "inicio": true
+      },
+      {
+        "etapa": "tipo_pergunta",
+        "timestamp": 0.011596202850341797,
+        "resultado": "quem"
+      },
+      {
+        "etapa": "criar_query",
+        "timestamp": 0.011667490005493164,
+        "inicio": true
+      },
+      {
+        "etapa": "criar_query",
+        "timestamp": 0.01673126220703125,
+        "query_pt": "Quem foi Albert Einstein?"
+      },
+      {
+        "etapa": "detectar_idioma",
+        "timestamp": 0.018781185150146484,
+        "idioma": "pt"
+      },
+      {
+        "etapa": "traduzir_query",
+        "timestamp": 0.31102943420410156,
+        "query_en": "Who was Albert Einstein?"
+      },
+      {
+        "etapa": "buscar_apis",
+        "timestamp": 0.31105875968933105,
+        "inicio": true
+      },
+      {
+        "etapa": "buscar_apis",
+        "timestamp": 0.7958123683929443,
+        "resultados": {
+          "wolfram": {
+            "status": "sucesso",
+            "tamanho": 211,
+            "preview": "Albert Einstein (14 March 1879 – 18 April 1955) was a German–born theoretical physicist who is best "
+          },
+          "google": {
+            "status": "sucesso",
+            "tamanho": 456,
+            "preview": "He became a German citizen in 1914 and remained in Berlin until 1933 when he renounced his citizensh"
+          },
+          "duckduckgo": {
+            "status": "vazio"
+          },
+          "wikipedia": {
+            "status": "vazio"
+          }
+        }
+      },
+      {
+        "etapa": "traduzir_resultados",
+        "timestamp": 0.795813798904419,
+        "inicio": true
+      },
+      {
+        "etapa": "traduzir_resultados",
+        "timestamp": 1.2694091796875,
+        "fonte": "wolfram",
+        "status": "ok",
+        "preview_pt": "Albert Einstein (14 de março de 1879 – 18 de abril de 1955) foi um físico teórico alemão mais conhec"
+      },
+      {
+        "etapa": "traduzir_resultados",
+        "timestamp": 2.6984663009643555,
+        "fonte": "google",
+        "status": "ok",
+        "preview_pt": "Ele se tornou cidadão alemão em 1914 e permaneceu em Berlim até 1933, quando renunciou à sua cidadan"
+      },
+      {
+        "etapa": "combinar_respostas",
+        "timestamp": 2.6984708309173584,
+        "inicio": true
+      },
+      {
+        "etapa": "combinar_respostas",
+        "timestamp": 2.7084269523620605,
+        "fonte_principal": "wolfram",
+        "sucesso": true
+      },
+      {
+        "etapa": "formatar_resposta",
+        "timestamp": 2.7084290981292725,
+        "inicio": true
+      },
+      {
+        "etapa": "formatar_resposta",
+        "timestamp": 2.7084879875183105,
+        "resposta_final": "Albert Einstein ( ) foi um físico teórico alemão mais conhecido por desenvolver a teoria da relativi"
+      },
+      {
+        "etapa": "salvar_cache",
+        "timestamp": 2.7085938453674316
+      },
+      {
+        "etapa": "fim",
+        "timestamp": 2.7085988521575928,
+        "detalhes": "Processamento concluído"
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-01-29T15:06:04.146578",
+    "pergunta": "Quando foi descoberto o Brasil?",
+    "resposta": "Chegada a Vera Cruz Avistamento da terra e primeira missa no Brasil Cabral avista o continente brasileiro pela primeira vez em , pintura de. . Oficialmente, Portugal descobriu o Brasil em . No entanto, parece que os portugueses sabiam secretamente da existência do Brasil antes de . O Brasil foi oficialmente descoberto em 1500, quando uma frota comandada pelo diplomata português Pedro Álvares Cabral, a caminho da Índia, desembarcou em Porto Seguro.",
+    "fonte": "google",
+    "status": "success",
+    "tempo_processamento": 1.543,
+    "erro": null,
+    "processo": [
+      {
+        "etapa": "inicio",
+        "timestamp": 9.5367431640625e-07,
+        "detalhes": "Query recebida: Quando foi descoberto o Brasil?"
+      },
+      {
+        "etapa": "validacao",
+        "timestamp": 6.67572021484375e-05,
+        "status": "ok"
+      },
+      {
+        "etapa": "detectar_intencao",
+        "timestamp": 6.818771362304688e-05,
+        "inicio": true
+      },
+      {
+        "etapa": "detectar_intencao",
+        "timestamp": 0.006117105484008789,
+        "resultado": "conhecimento"
+      },
+      {
+        "etapa": "cache",
+        "timestamp": 0.006135702133178711,
+        "resultado": "miss"
+      },
+      {
+        "etapa": "tipo_pergunta",
+        "timestamp": 0.006136178970336914,
+        "inicio": true
+      },
+      {
+        "etapa": "tipo_pergunta",
+        "timestamp": 0.014921426773071289,
+        "resultado": "quando"
+      },
+      {
+        "etapa": "criar_query",
+        "timestamp": 0.015026330947875977,
+        "inicio": true
+      },
+      {
+        "etapa": "criar_query",
+        "timestamp": 0.021338701248168945,
+        "query_pt": "Quando foi descoberto o Brasil?"
+      },
+      {
+        "etapa": "detectar_idioma",
+        "timestamp": 0.02433180809020996,
+        "idioma": "pt"
+      },
+      {
+        "etapa": "traduzir_query",
+        "timestamp": 0.10534501075744629,
+        "query_en": "When was Brazil discovered?"
+      },
+      {
+        "etapa": "buscar_apis",
+        "timestamp": 0.1053779125213623,
+        "inicio": true
+      },
+      {
+        "etapa": "buscar_apis",
+        "timestamp": 1.42417573928833,
+        "resultados": {
+          "wolfram": {
+            "status": "vazio"
+          },
+          "google": {
+            "status": "sucesso",
+            "tamanho": 498,
+            "preview": "Arrival at Vera Cruz · The sighting of the land and first mass in Brazil · Cabral sights the Brazili"
+          },
+          "duckduckgo": {
+            "status": "vazio"
+          },
+          "wikipedia": {
+            "status": "vazio"
+          }
+        }
+      },
+      {
+        "etapa": "traduzir_resultados",
+        "timestamp": 1.4241771697998047,
+        "inicio": true
+      },
+      {
+        "etapa": "traduzir_resultados",
+        "timestamp": 1.5351932048797607,
+        "fonte": "google",
+        "status": "ok",
+        "preview_pt": "Chegada a Vera Cruz · Avistamento da terra e primeira missa no Brasil · Cabral avista o continente b"
+      },
+      {
+        "etapa": "combinar_respostas",
+        "timestamp": 1.5351967811584473,
+        "inicio": true
+      },
+      {
+        "etapa": "combinar_respostas",
+        "timestamp": 1.5410330295562744,
+        "fonte_principal": "google",
+        "sucesso": true
+      },
+      {
+        "etapa": "formatar_resposta",
+        "timestamp": 1.54286789894104,
+        "inicio": true
+      },
+      {
+        "etapa": "formatar_resposta",
+        "timestamp": 1.5429956912994385,
+        "resposta_final": "Chegada a Vera Cruz Avistamento da terra e primeira missa no Brasil Cabral avista o continente brasi"
+      },
+      {
+        "etapa": "salvar_cache",
+        "timestamp": 1.5431509017944336
+      },
+      {
+        "etapa": "fim",
+        "timestamp": 1.5431554317474365,
+        "detalhes": "Processamento concluído"
+      }
+    ]
+  }
+]
