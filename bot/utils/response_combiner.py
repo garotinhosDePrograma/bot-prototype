@@ -6,7 +6,7 @@ import logging
 from typing import Dict, List, Optional
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from utils.text_utils import extrair_sentencas, juntar_sentencas, limpar_texto
+from bot.utils.text_utils import extrair_sentencas, juntar_sentencas, limpar_texto
 
 logger = logging.getLogger(__name__)
 

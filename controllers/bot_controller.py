@@ -1,4 +1,4 @@
-from bot_worker import BotWorker
+from bot.bot_worker import BotWorker
 from flask import Blueprint, jsonify, request
 
 bot_bp = Blueprint('bot', __name__, url_prefix="/api")

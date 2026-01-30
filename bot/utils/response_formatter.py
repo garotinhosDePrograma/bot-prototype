@@ -3,7 +3,7 @@ Módulo para formatação final de respostas.
 """
 
 import logging
-from utils.text_utils import limpar_texto
+from bot.utils.text_utils import limpar_texto
 
 logger = logging.getLogger(__name__)
 

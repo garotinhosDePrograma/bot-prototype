@@ -3,14 +3,14 @@ Script de teste para o Bot Worker refatorado (versão modular).
 Execute: python teste_bot.py
 """
 
-from bot_worker import BotWorker
+from bot.bot_worker import BotWorker
 import time
 import json
 from datetime import datetime
 import os
 
 # Diretório de logs
-LOGS_DIR = "logs"
+LOGS_DIR = "bot/logs"
 
 def criar_diretorio_logs():
     """Cria diretório de logs se não existir."""

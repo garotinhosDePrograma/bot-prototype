@@ -8,12 +8,12 @@ import time
 from random import choice
 from cachetools import TTLCache
 
-from utils.config import Config
-from api.search import BuscadorAPI
-from utils.text_utils import normalizar_texto, detectar_idioma, traduzir
-from utils.question_analyzer import AnalisadorPergunta
-from utils.response_combiner import CombinadorRespostas
-from utils.response_formatter import FormatadorResposta, RESPOSTAS_INTENCAO
+from bot.utils.config import Config
+from bot.api.search import BuscadorAPI
+from bot.utils.text_utils import normalizar_texto, detectar_idioma, traduzir
+from bot.utils.question_analyzer import AnalisadorPergunta
+from bot.utils.response_combiner import CombinadorRespostas
+from bot.utils.response_formatter import FormatadorResposta, RESPOSTAS_INTENCAO
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
