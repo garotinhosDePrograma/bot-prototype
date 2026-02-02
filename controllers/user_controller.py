@@ -36,3 +36,7 @@ def login():
         return jsonify({"error": "Campos obrigatórios faltando"}), 400
 
     return worker.login(email, senha)
+
+@user_bp.route('/all', methods=['GET'])
+def get_all_users():
+    return worker.getAll()

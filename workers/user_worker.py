@@ -27,7 +27,7 @@ class UserWorker:
         if not user.email:
             return jsonify({"error": "Email inválido"}), 401
 
-        if user.senha != bcrypt.checkpw(senha.encode("utf-8"), user.senha):
+        if not bcrypt.checkpw(senha.encode("utf-8"), user.senha.encode("utf-8")):
             return jsonify({"error": "Senha inválida"}), 401
 
         token = jwt.encode(
@@ -41,5 +41,11 @@ class UserWorker:
 
         return jsonify({
             "token": token,
-            "user": user
+            "user": user.to_dict()
         })
+
+    def getAll(self):
+        users = repo.getAll()
+        if not users:
+            return jsonify({"users": "Empty"})
+        return jsonify({"users": users})
