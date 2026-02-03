@@ -70,7 +70,8 @@ cachetools==5.3.2
 # 
 # 1. INSTALAÇÃO COMPLETA:
 #    pip install -r requirements.txt
-#    python -m spacy download pt_core_news_sm
+python -m spacy download pt_core_news_sm
+
 #
 # 2. ESPAÇO EM DISCO:
 #    - Dependências básicas: ~200MB
