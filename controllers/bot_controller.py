@@ -3,7 +3,7 @@ Bot Controller - Rotas da API para o bot
 """
 
 from flask import Blueprint, jsonify, request
-from bot.workers.bot_worker import BotWorker
+from bot.bot_worker import BotWorker
 import logging
 
 logger = logging.getLogger(__name__)
