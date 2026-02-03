@@ -1,5 +1,5 @@
 """
-Bot Worker - Versão refatorada e modular
+Bot Worker - Versão refatorada com integração ao banco de dados
 Busca em todas as APIs e combina respostas de forma inteligente
 """
 
@@ -14,11 +14,12 @@ from bot.utils.text_utils import normalizar_texto, detectar_idioma, traduzir
 from bot.utils.question_analyzer import AnalisadorPergunta
 from bot.utils.response_combiner import CombinadorRespostas
 from bot.utils.response_formatter import FormatadorResposta, RESPOSTAS_INTENCAO
+from repositories.bot_repository import BotRepository
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Cache de respostas
+# Cache de respostas (em memória)
 cache = TTLCache(maxsize=100, ttl=3600)
 
 # Contexto da conversa
@@ -27,8 +28,8 @@ contexto = []
 
 class BotWorker:
     """
-    Chatbot que busca informações em múltiplas fontes
-    e combina as respostas de forma inteligente.
+    Chatbot que busca informações em múltiplas fontes,
+    combina as respostas de forma inteligente e salva no banco de dados.
     """
 
     def __init__(self):
@@ -41,16 +42,18 @@ class BotWorker:
         self.analisador = AnalisadorPergunta()
         self.combinador = CombinadorRespostas()
         self.formatador = FormatadorResposta()
+        self.repository = BotRepository()
 
-        logger.info("BotWorker inicializado com sucesso (versão modular).")
+        logger.info("BotWorker inicializado com sucesso (versão com DB).")
 
-    def process_query(self, query: str, usuario_id: int = None) -> dict:
+    def process_query(self, query: str, user_id: int = None) -> dict:
         """
         Processa uma query do usuário e retorna resposta estruturada.
+        Se user_id for fornecido, salva a conversa no banco de dados.
 
         Args:
             query: Pergunta do usuário
-            usuario_id: ID do usuário (opcional)
+            user_id: ID do usuário (opcional, mas necessário para salvar no DB)
 
         Returns:
             Dicionário com status, resposta e metadados incluindo logs do processo
@@ -60,17 +63,30 @@ class BotWorker:
 
         try:
             logs_processo.append({"etapa": "inicio", "timestamp": time.time() - start_time, "detalhes": f"Query recebida: {query}"})
-            logger.info(f"Processando query: {query} (usuario_id: {usuario_id})")
+            logger.info(f"Processando query: {query} (user_id: {user_id})")
 
             # Valida entrada
             valid, message = self._validate_input(query)
             if not valid:
                 logs_processo.append({"etapa": "validacao", "timestamp": time.time() - start_time, "status": "erro", "detalhes": message})
+                
+                # Salva erro no banco se user_id fornecido
+                if user_id:
+                    self._save_conversation(
+                        user_id=user_id,
+                        pergunta=query,
+                        resposta=message,
+                        fonte="validacao",
+                        tempo_processamento=time.time() - start_time,
+                        status="error",
+                        logs_processo=logs_processo
+                    )
+                
                 return {
                     "status": "error",
                     "query": query,
                     "message": message,
-                    "usuario_id": usuario_id,
+                    "user_id": user_id,
                     "response": "",
                     "source": "validacao",
                     "processing_time": round(time.time() - start_time, 3),
@@ -86,12 +102,24 @@ class BotWorker:
             processing_time = time.time() - start_time
             logs_processo.append({"etapa": "fim", "timestamp": processing_time, "detalhes": "Processamento concluído"})
 
+            # Salva conversa no banco se user_id fornecido
+            if user_id:
+                self._save_conversation(
+                    user_id=user_id,
+                    pergunta=query,
+                    resposta=response,
+                    fonte=source,
+                    tempo_processamento=processing_time,
+                    status="success",
+                    logs_processo=logs_processo
+                )
+
             return {
                 "status": "success",
                 "query": query,
                 "response": response,
                 "source": source,
-                "usuario_id": usuario_id,
+                "user_id": user_id,
                 "processing_time": round(processing_time, 3),
                 "logs_processo": logs_processo
             }
@@ -100,15 +128,246 @@ class BotWorker:
             logger.error(f"Erro ao processar query: {str(e)}", exc_info=True)
             processing_time = time.time() - start_time
             logs_processo.append({"etapa": "erro", "timestamp": processing_time, "detalhes": str(e)})
+            
+            error_message = "Ocorreu um erro ao processar sua pergunta."
+            
+            # Salva erro no banco se user_id fornecido
+            if user_id:
+                self._save_conversation(
+                    user_id=user_id,
+                    pergunta=query,
+                    resposta=error_message,
+                    fonte="erro",
+                    tempo_processamento=processing_time,
+                    status="error",
+                    logs_processo=logs_processo
+                )
+            
             return {
                 "status": "error",
                 "query": query,
                 "message": f"Erro interno: {str(e)}",
-                "response": "Ocorreu um erro ao processar sua pergunta.",
+                "response": error_message,
                 "source": "erro",
-                "usuario_id": usuario_id,
+                "user_id": user_id,
                 "processing_time": round(processing_time, 3),
                 "logs_processo": logs_processo
+            }
+
+    def _save_conversation(self, user_id, pergunta, resposta, fonte, tempo_processamento, status, logs_processo):
+        """
+        Salva a conversa no banco de dados via repository.
+        
+        Args:
+            user_id (int): ID do usuário
+            pergunta (str): Pergunta feita
+            resposta (str): Resposta gerada
+            fonte (str): Fonte(s) usada(s)
+            tempo_processamento (float): Tempo em segundos
+            status (str): Status da operação
+            logs_processo (list): Logs detalhados do processo
+        """
+        try:
+            # Prepara metadata
+            metadata = {
+                "logs_processo": logs_processo,
+                "cache_usado": tempo_processamento < 0.1
+            }
+            
+            # Salva no banco
+            conversation = self.repository.create_conversation(
+                user_id=user_id,
+                pergunta=pergunta,
+                resposta=resposta,
+                fonte=fonte,
+                tempo_processamento=tempo_processamento,
+                status=status,
+                metadata=metadata
+            )
+            
+            if conversation:
+                logger.info(f"Conversa salva no banco: ID={conversation.id}")
+            else:
+                logger.error("Falha ao salvar conversa no banco")
+                
+        except Exception as e:
+            logger.error(f"Erro ao salvar conversa: {str(e)}", exc_info=True)
+
+    def get_user_history(self, user_id, limit=20, offset=0):
+        """
+        Busca histórico de conversas do usuário.
+        
+        Args:
+            user_id (int): ID do usuário
+            limit (int): Número de conversas por página
+            offset (int): Deslocamento para paginação
+            
+        Returns:
+            dict: Histórico com conversas e metadados de paginação
+        """
+        try:
+            conversations = self.repository.get_user_conversations(user_id, limit, offset)
+            total = self.repository.get_total_conversations_count(user_id)
+            
+            return {
+                "status": "success",
+                "conversations": [c.to_dict_summary() for c in conversations],
+                "pagination": {
+                    "total": total,
+                    "limit": limit,
+                    "offset": offset,
+                    "has_more": (offset + limit) < total
+                }
+            }
+        except Exception as e:
+            logger.error(f"Erro ao buscar histórico: {str(e)}", exc_info=True)
+            return {
+                "status": "error",
+                "message": str(e),
+                "conversations": [],
+                "pagination": {"total": 0, "limit": limit, "offset": offset, "has_more": False}
+            }
+
+    def get_conversation(self, conversation_id):
+        """
+        Busca uma conversa específica por ID.
+        
+        Args:
+            conversation_id (int): ID da conversa
+            
+        Returns:
+            dict: Conversa completa ou erro
+        """
+        try:
+            conversation = self.repository.get_conversation_by_id(conversation_id)
+            
+            if conversation:
+                return {
+                    "status": "success",
+                    "conversation": conversation.to_dict(include_metadata=True)
+                }
+            else:
+                return {
+                    "status": "error",
+                    "message": "Conversa não encontrada"
+                }
+        except Exception as e:
+            logger.error(f"Erro ao buscar conversa: {str(e)}", exc_info=True)
+            return {
+                "status": "error",
+                "message": str(e)
+            }
+
+    def search_conversations(self, user_id, query, limit=20):
+        """
+        Busca conversas por palavra-chave.
+        
+        Args:
+            user_id (int): ID do usuário
+            query (str): Termo de busca
+            limit (int): Número máximo de resultados
+            
+        Returns:
+            dict: Resultados da busca
+        """
+        try:
+            conversations = self.repository.search_conversations(user_id, query, limit)
+            
+            return {
+                "status": "success",
+                "query": query,
+                "results": [c.to_dict_summary() for c in conversations],
+                "total": len(conversations)
+            }
+        except Exception as e:
+            logger.error(f"Erro ao buscar conversas: {str(e)}", exc_info=True)
+            return {
+                "status": "error",
+                "message": str(e),
+                "results": [],
+                "total": 0
+            }
+
+    def delete_conversation(self, conversation_id, user_id):
+        """
+        Deleta uma conversa específica.
+        
+        Args:
+            conversation_id (int): ID da conversa
+            user_id (int): ID do usuário (para validação)
+            
+        Returns:
+            dict: Resultado da operação
+        """
+        try:
+            deleted = self.repository.delete_conversation(conversation_id, user_id)
+            
+            if deleted:
+                return {
+                    "status": "success",
+                    "message": "Conversa deletada com sucesso"
+                }
+            else:
+                return {
+                    "status": "error",
+                    "message": "Conversa não encontrada ou sem permissão"
+                }
+        except Exception as e:
+            logger.error(f"Erro ao deletar conversa: {str(e)}", exc_info=True)
+            return {
+                "status": "error",
+                "message": str(e)
+            }
+
+    def get_user_statistics(self, user_id):
+        """
+        Retorna estatísticas do usuário.
+        
+        Args:
+            user_id (int): ID do usuário
+            
+        Returns:
+            dict: Estatísticas detalhadas
+        """
+        try:
+            stats = self.repository.get_user_statistics(user_id)
+            
+            return {
+                "status": "success",
+                "statistics": stats
+            }
+        except Exception as e:
+            logger.error(f"Erro ao buscar estatísticas: {str(e)}", exc_info=True)
+            return {
+                "status": "error",
+                "message": str(e),
+                "statistics": {}
+            }
+
+    def clear_user_history(self, user_id):
+        """
+        Limpa todo o histórico do usuário.
+        
+        Args:
+            user_id (int): ID do usuário
+            
+        Returns:
+            dict: Resultado da operação
+        """
+        try:
+            deleted_count = self.repository.delete_user_conversations(user_id)
+            
+            return {
+                "status": "success",
+                "message": f"{deleted_count} conversas deletadas",
+                "deleted_count": deleted_count
+            }
+        except Exception as e:
+            logger.error(f"Erro ao limpar histórico: {str(e)}", exc_info=True)
+            return {
+                "status": "error",
+                "message": str(e),
+                "deleted_count": 0
             }
 
     def _validate_input(self, mensagem: str) -> tuple:
@@ -253,14 +512,3 @@ class BotWorker:
         # Mantém apenas últimas 5 interações
         if len(contexto) > 5:
             contexto.pop(0)
-
-
-# Para compatibilidade com código antigo
-if __name__ == "__main__":
-    bot = BotWorker()
-
-    # Teste rápido
-    resultado = bot.process_query("Qual a capital da França?")
-    print(f"Resposta: {resultado['response']}")
-    print(f"Fonte: {resultado['source']}")
-    print(f"Tempo: {resultado['processing_time']}s")
