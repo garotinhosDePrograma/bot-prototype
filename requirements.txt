@@ -28,6 +28,7 @@ requests==2.31.0
 
 # ==================== PROCESSAMENTO DE LINGUAGEM NATURAL ====================
 spacy==3.7.2
+https://github.com/explosion/spacy-models/releases/download/pt_core_news_sm-3.7.0/pt_core_news_sm-3.7.0-py3-none-any.whl
 # IMPORTANTE: Após instalar spacy, execute:
 # python -m spacy download pt_core_news_sm
 
@@ -70,7 +71,7 @@ cachetools==5.3.2
 # 
 # 1. INSTALAÇÃO COMPLETA:
 #    pip install -r requirements.txt
-python -m spacy download pt_core_news_sm
+#    python -m spacy download pt_core_news_sm
 
 #
 # 2. ESPAÇO EM DISCO:
