@@ -707,8 +707,8 @@ Desenvolvido por [Luiz Fagner]
 
 Encontrou um bug? Tem uma sugestão?
 
-- Abra uma [issue](https://github.com/WirkLichKeit1/bot-prototype/issues)
-- Envie um [pull request](https://github.com/WirkLichKeit1/bot-prototype/pulls)
+- Abra uma [issue](https://github.com/garotinhosDePrograma/bot-prototype/issues)
+- Envie um [pull request](https://github.com/garotinhosDePrograma/bot-prototype/pulls)
 
 ---
 
