@@ -219,3 +219,201 @@ class BuscadorAPI:
                 return resultados[fonte], fonte
 
         return None, None
+
+    def buscar_wikipedia_avancado(self, pergunta_en: str, lingua: str = "pt") -> Optional[str]:
+        """
+        Busca avançada na Wikipedia com múltiplas estratégias.
+        """
+        # 1. Tenta busca em português primeiro
+        resultado_pt = self._buscar_wikipedia_idioma(pergunta_en, "pt")
+        if resultado_pt:
+            return resultado_pt
+        
+        # 2. Se falhou, tenta em inglês
+        resultado_en = self._buscar_wikipedia_idioma(pergunta_en, "en")
+        if resultado_en:
+            # Traduz resultado
+            from bot.utils.text_utils import traduzir
+            return traduzir(resultado_en, origem="en", destino="pt")
+        
+        return None
+    
+    def _buscar_wikipedia_idioma(self, query: str, idioma: str) -> Optional[str]:
+        """Busca Wikipedia em idioma específico."""
+        try:
+            api_url = f"https://{idioma}.wikipedia.org/w/api.php"
+            
+            # Busca artigos
+            search_params = {
+                "action": "query",
+                "list": "search",
+                "srsearch": query,
+                "format": "json",
+                "srlimit": 3
+            }
+            
+            response = requests.get(api_url, params=search_params, timeout=5)
+            data = response.json()
+            
+            if not data.get('query', {}).get('search'):
+                return None
+            
+            # Pega primeiro resultado
+            primeiro_resultado = data['query']['search'][0]
+            titulo = primeiro_resultado['title']
+            
+            # Busca conteúdo do artigo
+            content_params = {
+                "action": "query",
+                "prop": "extracts",
+                "exintro": True,
+                "explaintext": True,
+                "titles": titulo,
+                "format": "json"
+            }
+            
+            content_response = requests.get(api_url, params=content_params, timeout=5)
+            content_data = content_response.json()
+            
+            pages = content_data.get('query', {}).get('pages', {})
+            if pages:
+                page = list(pages.values())[0]
+                extract = page.get('extract', '')
+                
+                if extract and len(extract) > 100:
+                    logger.info(f"Wikipedia ({idioma}): {extract[:100]}...")
+                    return extract
+            
+            return None
+        except Exception as e:
+            logger.error(f"Erro Wikipedia ({idioma}): {str(e)}")
+            return None
+    
+    def buscar_arxiv(self, pergunta_en: str) -> Optional[str]:
+        """
+        Busca em artigos científicos do arXiv.
+        Útil para perguntas acadêmicas/científicas.
+        """
+        try:
+            import urllib.parse
+            
+            # Monta query para arXiv
+            query = urllib.parse.quote(pergunta_en)
+            url = f"http://export.arxiv.org/api/query?search_query=all:{query}&start=0&max_results=3"
+            
+            response = requests.get(url, timeout=7)
+            
+            if response.status_code != 200:
+                return None
+            
+            # Parse XML simples (pode usar BeautifulSoup para melhor parsing)
+            content = response.text
+            
+            # Extrai summaries (resumos)
+            import re
+            summaries = re.findall(r'<summary>(.*?)</summary>', content, re.DOTALL)
+            
+            if summaries:
+                # Pega primeiros 2-3 resumos
+                textos = []
+                for summary in summaries[:2]:
+                    # Remove whitespace extra
+                    summary_clean = ' '.join(summary.split())
+                    if len(summary_clean) > 100:
+                        textos.append(summary_clean)
+                
+                if textos:
+                    resultado = ' '.join(textos[:2])
+                    logger.info(f"arXiv: {resultado[:100]}...")
+                    return resultado
+            
+            return None
+        except Exception as e:
+            logger.error(f"Erro arXiv: {str(e)}")
+            return None
+    
+    def buscar_dbpedia(self, pergunta_en: str) -> Optional[str]:
+        """
+        Busca em DBpedia (base de conhecimento estruturado).
+        Ótimo para fatos estruturados.
+        """
+        try:
+            # Extrai entidade principal da pergunta
+            # (simplificado - pode melhorar com NER)
+            palavras = pergunta_en.split()
+            palavras_relevantes = [p for p in palavras if p[0].isupper() and len(p) > 2]
+            
+            if not palavras_relevantes:
+                return None
+            
+            entidade = '_'.join(palavras_relevantes[:2])
+            
+            # Busca no DBpedia
+            url = f"http://dbpedia.org/data/{entidade}.json"
+            response = requests.get(url, timeout=5)
+            
+            if response.status_code != 200:
+                return None
+            
+            data = response.json()
+            
+            # Extrai abstracts
+            resource_uri = f"http://dbpedia.org/resource/{entidade}"
+            if resource_uri in data:
+                resource_data = data[resource_uri]
+                
+                # Procura por abstract
+                abstract_key = "http://dbpedia.org/ontology/abstract"
+                if abstract_key in resource_data:
+                    abstracts = resource_data[abstract_key]
+                    
+                    # Pega abstract em inglês
+                    for abstract in abstracts:
+                        if abstract.get('lang') == 'en':
+                            texto = abstract.get('value', '')
+                            if len(texto) > 100:
+                                logger.info(f"DBpedia: {texto[:100]}...")
+                                return texto
+            
+            return None
+        except Exception as e:
+            logger.error(f"Erro DBpedia: {str(e)}")
+            return None
+    
+    def buscar_youtube_transcript(self, pergunta_en: str) -> Optional[str]:
+        """
+        Busca vídeos educacionais no YouTube e tenta extrair transcrições.
+        Útil para tutoriais e explicações.
+        """
+        try:
+            from youtube_search import YoutubeSearch
+            from youtube_transcript_api import YouTubeTranscriptApi
+            
+            # Busca vídeos
+            query = pergunta_en + " tutorial explanation"
+            resultados = YoutubeSearch(query, max_results=3).to_dict()
+            
+            if not resultados:
+                return None
+            
+            # Tenta pegar transcrição do primeiro vídeo
+            for video in resultados:
+                video_id = video['id']
+                
+                try:
+                    # Pega transcrição
+                    transcript_list = YouTubeTranscriptApi.get_transcript(video_id, languages=['pt', 'en'])
+                    
+                    # Junta textos
+                    texto_completo = ' '.join([t['text'] for t in transcript_list[:20]])  # Primeiros 20 segmentos
+                    
+                    if len(texto_completo) > 100:
+                        logger.info(f"YouTube: {texto_completo[:100]}...")
+                        return texto_completo
+                except:
+                    continue
+            
+            return None
+        except Exception as e:
+            logger.error(f"Erro YouTube: {str(e)}")
+            return None
