@@ -1,107 +1,15 @@
-# ================================================================
-# BOT WORKER - Dependências do Projeto
-# ================================================================
-# Instalação: pip install -r requirements.txt
-# Python 3.8+ requerido
-# ================================================================
-
-# ==================== GUNICORN ==================================
 gunicorn
-
-# ==================== FRAMEWORK WEB ====================
 Flask==2.3.0
 Flask-CORS==4.0.0
 Werkzeug==2.3.0
-
-# ==================== BANCO DE DADOS ====================
 mysql-connector-python==8.1.0
-
-# ==================== AUTENTICAÇÃO & SEGURANÇA ====================
 PyJWT==2.8.0
 bcrypt==4.0.1
-
-# ==================== VARIÁVEIS DE AMBIENTE ====================
 python-dotenv==1.0.0
-
-# ==================== APIs & REQUISIÇÕES WEB ====================
 requests==2.31.0
-
-# ==================== PROCESSAMENTO DE LINGUAGEM NATURAL ====================
 spacy==3.7.2
 https://github.com/explosion/spacy-models/releases/download/pt_core_news_sm-3.7.0/pt_core_news_sm-3.7.0-py3-none-any.whl
-# IMPORTANTE: Após instalar spacy, execute:
-# python -m spacy download pt_core_news_sm
-
-# ==================== DETECÇÃO E TRADUÇÃO DE IDIOMAS ====================
 langdetect==1.0.9
 deep-translator==1.11.4
-
-# ==================== MACHINE LEARNING ====================
 scikit-learn==1.3.2
-# Nota: Usado apenas para TF-IDF e similaridade cossenoidal
-# NÃO requer GPU ou Torch!
-
-# ==================== CACHE ====================
 cachetools==5.3.2
-
-# ==================== UTILITÁRIOS ====================
-# Já incluídos no Python 3.8+, mas listados para referência:
-# - json (built-in)
-# - logging (built-in)
-# - datetime (built-in)
-# - time (built-in)
-# - unicodedata (built-in)
-# - re (built-in)
-
-# ================================================================
-# DEPENDÊNCIAS OPCIONAIS (DESENVOLVIMENTO)
-# ================================================================
-# Descomente se necessário:
-
-# pytest==7.4.3              # Testes unitários
-# pytest-cov==4.1.0          # Cobertura de testes
-# black==23.11.0             # Formatação de código
-# flake8==6.1.0              # Linting
-# ipython==8.17.2            # Console interativo
-# python-decouple==3.8       # Alternativa ao python-dotenv
-
-# ================================================================
-# NOTAS DE INSTALAÇÃO
-# ================================================================
-# 
-# 1. INSTALAÇÃO COMPLETA:
-#    pip install -r requirements.txt
-#    python -m spacy download pt_core_news_sm
-
-#
-# 2. ESPAÇO EM DISCO:
-#    - Dependências básicas: ~200MB
-#    - Modelo spaCy (pt_core_news_sm): ~50MB
-#    - Total: ~250MB
-#
-# 3. SEM GPU NECESSÁRIA:
-#    - Projeto funciona em CPU
-#    - Scikit-learn não requer CUDA
-#
-# 4. COMPATIBILIDADE:
-#    - Python 3.8, 3.9, 3.10, 3.11, 3.12
-#    - Linux, macOS, Windows
-#
-# 5. PROBLEMAS COMUNS:
-#    - Se mysql-connector-python falhar, tente:
-#      pip install mysql-connector-python --no-cache-dir
-#    
-#    - Se spaCy falhar no download do modelo:
-#      python -m spacy download pt_core_news_sm --user
-#
-#    - Se bcrypt falhar (Windows):
-#      Instale Visual C++ Build Tools
-#      https://visualstudio.microsoft.com/downloads/
-#
-# ================================================================
-# VERSÕES TESTADAS
-# ================================================================
-# Última atualização: 2024-01-29
-# Python: 3.10.12
-# Sistema: Ubuntu 22.04 LTS
-# ================================================================
