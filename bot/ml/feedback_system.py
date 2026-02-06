@@ -99,7 +99,7 @@ class SistemaFeedback:
             logger.error(f"Erro ao buscar conversas com feedback: {str(e)}")
             return []
     
-    def calcular_taxa_satisfacao(self, user_id: Optional[int] = None) -> Dict:
+    def calcular_taxa_satisfacao(self, user_id: Optional[int] = None) -> dict:
         """
         Calcula taxa de satisfação geral ou por usuário.
         """
