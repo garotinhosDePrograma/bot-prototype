@@ -14,6 +14,10 @@ from bot.utils.text_utils import normalizar_texto, detectar_idioma, traduzir
 from bot.utils.question_analyzer import AnalisadorPergunta
 from bot.utils.response_combiner import CombinadorRespostas
 from bot.utils.response_formatter import FormatadorResposta, RESPOSTAS_INTENCAO
+from bot.utils.advanced_analyzer import AnalisadorAvancado
+from bot.utils.search_strategy import EstrategiaBusca
+from bot.ml.learning_system import SistemaAprendizado
+from bot.ml.feedback_system import SistemaFeedback
 from repositories.bot_repository import BotRepository
 
 logging.basicConfig(level=logging.INFO)
@@ -44,6 +48,13 @@ class BotWorker:
         self.formatador = FormatadorResposta()
         self.repository = BotRepository()
 
+        self.analisador_avancado = AnalisadorAvancado()
+        self.estrategia_busca = EstrategiaBusca()
+        self.sistema_aprendizado = SistemaAprendizado(self.repository)
+        self.sistema_feedback = SistemaFeedback(self.repository)
+
+        self.contador_conversas = 0
+        
         logger.info("BotWorker inicializado com sucesso (versão com DB).")
 
     def process_query(self, query: str, user_id: int = None) -> dict:
@@ -380,18 +391,32 @@ class BotWorker:
 
     def _get_bot_response_with_logs(self, pergunta: str, start_time: float) -> tuple:
         """
-        Obtém resposta do bot para uma pergunta, retornando logs detalhados.
-
-        Returns:
-            (resposta, fonte, logs_processo)
+        VERSÃO MELHORADA com análise avançada e aprendizado.
         """
         logs = []
 
         try:
-            # Detecta intenção
-            logs.append({"etapa": "detectar_intencao", "timestamp": time.time() - start_time, "inicio": True})
-            intencao = self.analisador.detectar_intencao(pergunta)
-            logs.append({"etapa": "detectar_intencao", "timestamp": time.time() - start_time, "resultado": intencao})
+            # 1. BUSCAR RESPOSTA APRENDIDA PRIMEIRO
+            logs.append({"etapa": "buscar_aprendida", "timestamp": time.time() - start_time, "inicio": True})
+            resposta_aprendida, qualidade_aprendida = self.sistema_aprendizado.buscar_resposta_aprendida(pergunta)
+            
+            if resposta_aprendida and qualidade_aprendida > 0.9:
+                logs.append({"etapa": "buscar_aprendida", "timestamp": time.time() - start_time, 
+                           "resultado": "encontrada", "qualidade": qualidade_aprendida})
+                logger.info(f"Usando resposta aprendida (qualidade: {qualidade_aprendida:.2f})")
+                return resposta_aprendida, "aprendizado", logs
+            
+            logs.append({"etapa": "buscar_aprendida", "timestamp": time.time() - start_time, "resultado": "nao_encontrada"})
+
+            # 2. ANÁLISE AVANÇADA DA PERGUNTA
+            logs.append({"etapa": "analise_avancada", "timestamp": time.time() - start_time, "inicio": True})
+            analise_completa = self.analisador_avancado.analisar_completo(pergunta)
+            logs.append({"etapa": "analise_avancada", "timestamp": time.time() - start_time, "resultado": analise_completa})
+            
+            # 3. DETECTAR INTENÇÃO (com ML se disponível)
+            logs.append({"etapa": "detectar_intencao_ml", "timestamp": time.time() - start_time, "inicio": True})
+            intencao = self.sistema_aprendizado.prever_intencao(pergunta)
+            logs.append({"etapa": "detectar_intencao_ml", "timestamp": time.time() - start_time, "resultado": intencao})
 
             # Se não é pergunta de conhecimento, responde direto
             if intencao != "conhecimento":
@@ -399,10 +424,10 @@ class BotWorker:
                 logs.append({"etapa": "resposta_direta", "timestamp": time.time() - start_time, "intencao": intencao})
                 return resposta, intencao, logs
 
-            # Atualiza contexto
+            # 4. ATUALIZAR CONTEXTO
             self._atualizar_contexto(pergunta, intencao)
 
-            # Verifica cache
+            # 5. VERIFICAR CACHE
             pergunta_normalizada = normalizar_texto(pergunta)
             if pergunta_normalizada in cache:
                 logger.info("Resposta obtida do cache")
@@ -412,66 +437,62 @@ class BotWorker:
 
             logs.append({"etapa": "cache", "timestamp": time.time() - start_time, "resultado": "miss"})
 
-            # Detecta tipo de pergunta
+            # 6. DETECTAR TIPO DE PERGUNTA
             logs.append({"etapa": "tipo_pergunta", "timestamp": time.time() - start_time, "inicio": True})
             tipo_pergunta = self.analisador.detectar_tipo_pergunta(pergunta)
             logs.append({"etapa": "tipo_pergunta", "timestamp": time.time() - start_time, "resultado": tipo_pergunta})
-            logger.info(f"Tipo de pergunta detectado: {tipo_pergunta}")
 
-            # Cria query otimizada para busca
-            logs.append({"etapa": "criar_query", "timestamp": time.time() - start_time, "inicio": True})
-            query_busca = self.analisador.criar_query_busca(pergunta)
-            logs.append({"etapa": "criar_query", "timestamp": time.time() - start_time, "query_pt": query_busca})
+            # 7. ESTRATÉGIA DE BUSCA INTELIGENTE
+            logs.append({"etapa": "estrategia_busca", "timestamp": time.time() - start_time, "inicio": True})
+            fontes_selecionadas = self.estrategia_busca.selecionar_fontes(analise_completa)
+            queries_multiplas = self.estrategia_busca.criar_queries_multiplas(pergunta, analise_completa)
+            logs.append({"etapa": "estrategia_busca", "timestamp": time.time() - start_time, 
+                       "fontes": fontes_selecionadas, "queries": queries_multiplas})
 
-            # Detecta idioma e traduz se necessário
+            # 8. TRADUÇÃO E BUSCA
             idioma = detectar_idioma(pergunta)
             logs.append({"etapa": "detectar_idioma", "timestamp": time.time() - start_time, "idioma": idioma})
 
-            query_en = query_busca if idioma == "en" else traduzir(query_busca, origem=idioma, destino="en")
-            logs.append({"etapa": "traduzir_query", "timestamp": time.time() - start_time, "query_en": query_en})
-            logger.info(f"Query para busca (EN): {query_en}")
+            # Busca com múltiplas queries se necessário
+            resultados_agregados = {}
+            
+            for query in queries_multiplas[:2]:  # Máximo 2 queries para não sobrecarregar
+                query_en = query if idioma == "en" else traduzir(query, origem=idioma, destino="en")
+                logs.append({"etapa": "traduzir_query", "timestamp": time.time() - start_time, "query_en": query_en})
 
-            # BUSCA EM TODAS AS APIs SIMULTANEAMENTE
-            logs.append({"etapa": "buscar_apis", "timestamp": time.time() - start_time, "inicio": True})
-            resultados = self.buscador.buscar_todas(query_en)
+                # BUSCA NAS FONTES SELECIONADAS
+                logs.append({"etapa": "buscar_apis", "timestamp": time.time() - start_time, "inicio": True})
+                resultados = self.buscador.buscar_todas(query_en)
+                
+                # Filtra apenas fontes selecionadas
+                resultados_filtrados = {k: v for k, v in resultados.items() if k in fontes_selecionadas}
+                
+                # Mescla resultados
+                for fonte, resultado in resultados_filtrados.items():
+                    if resultado and fonte not in resultados_agregados:
+                        resultados_agregados[fonte] = resultado
 
-            # Log dos resultados
-            resultados_info = {}
-            for fonte, resultado in resultados.items():
-                if resultado:
-                    resultados_info[fonte] = {"status": "sucesso", "tamanho": len(resultado), "preview": resultado[:100]}
-                    logger.info(f"✓ {fonte}: {len(resultado)} caracteres")
-                else:
-                    resultados_info[fonte] = {"status": "vazio"}
-                    logger.info(f"✗ {fonte}: sem resultado")
+            logs.append({"etapa": "buscar_apis", "timestamp": time.time() - start_time, "resultados": resultados_agregados})
 
-            logs.append({"etapa": "buscar_apis", "timestamp": time.time() - start_time, "resultados": resultados_info})
-
-            # Traduz resultados para português
+            # 9. TRADUZ RESULTADOS
             logs.append({"etapa": "traduzir_resultados", "timestamp": time.time() - start_time, "inicio": True})
             resultados_pt = {}
-            for fonte, resultado in resultados.items():
+            for fonte, resultado in resultados_agregados.items():
                 if resultado:
                     try:
                         resultado_traduzido = traduzir(resultado, origem="en", destino="pt")
                         resultados_pt[fonte] = resultado_traduzido
-                        logs.append({"etapa": "traduzir_resultados", "timestamp": time.time() - start_time, 
-                                   "fonte": fonte, "status": "ok", "preview_pt": resultado_traduzido[:100]})
                     except Exception as e:
                         logger.error(f"Erro ao traduzir resultado de {fonte}: {str(e)}")
                         resultados_pt[fonte] = resultado
-                        logs.append({"etapa": "traduzir_resultados", "timestamp": time.time() - start_time, 
-                                   "fonte": fonte, "status": "erro", "erro": str(e)})
 
-            # Combina respostas de todas as fontes
+            # 10. COMBINA RESPOSTAS
             logs.append({"etapa": "combinar_respostas", "timestamp": time.time() - start_time, "inicio": True})
             resposta_combinada, fonte_principal = self.combinador.combinar_com_fonte_principal(
                 resultados_pt, 
                 pergunta, 
                 tipo_pergunta
             )
-            logs.append({"etapa": "combinar_respostas", "timestamp": time.time() - start_time, 
-                       "fonte_principal": fonte_principal, "sucesso": resposta_combinada is not None})
 
             if not resposta_combinada:
                 logger.info("Nenhuma resposta válida encontrada")
@@ -479,19 +500,37 @@ class BotWorker:
                 fonte = "nenhuma"
                 logs.append({"etapa": "resposta_fallback", "timestamp": time.time() - start_time})
             else:
-                # Formata resposta final
+                # 11. FORMATA RESPOSTA
                 logs.append({"etapa": "formatar_resposta", "timestamp": time.time() - start_time, "inicio": True})
                 resposta = self.formatador.formatar_final(resposta_combinada, tipo_pergunta)
                 fonte = fonte_principal
-                logs.append({"etapa": "formatar_resposta", "timestamp": time.time() - start_time, 
-                           "resposta_final": resposta[:100]})
 
-                logger.info(f"Resposta final: {resposta[:100]}...")
-                logger.info(f"Fonte(s): {fonte}")
+                # 12. AVALIA QUALIDADE DA RESPOSTA (ML)
+                qualidade = self.sistema_aprendizado.avaliar_qualidade_resposta(pergunta, resposta)
+                logs.append({"etapa": "avaliar_qualidade", "timestamp": time.time() - start_time, "qualidade": qualidade})
+
+                # 13. APRENDE PADRÃO SE BOA RESPOSTA
+                if qualidade > 0.7:
+                    self.sistema_aprendizado.aprender_padrao(pergunta, resposta, qualidade)
+                    logs.append({"etapa": "aprender_padrao", "timestamp": time.time() - start_time})
+
+            # 14. ATUALIZA STATS DAS FONTES
+            tempo_busca = time.time() - start_time
+            sucesso = resposta_combinada is not None
+            if fonte_principal and fonte_principal != "nenhuma":
+                fontes_usadas = fonte_principal.split("+")
+                for f in fontes_usadas:
+                    self.sistema_aprendizado.atualizar_stats_fonte(f, tempo_busca, sucesso)
 
             # Salva no cache
             cache[pergunta_normalizada] = (resposta, fonte)
             logs.append({"etapa": "salvar_cache", "timestamp": time.time() - start_time})
+
+            # 15. RETREINAMENTO PERIÓDICO
+            self.contador_conversas += 1
+            if self.contador_conversas % 100 == 0:  # A cada 100 conversas
+                logger.info("Iniciando retreinamento periódico...")
+                self.sistema_aprendizado.retreinar_periodicamente()
 
             return resposta, fonte, logs
 
@@ -512,3 +551,15 @@ class BotWorker:
         # Mantém apenas últimas 5 interações
         if len(contexto) > 5:
             contexto.pop(0)
+    
+    def registrar_feedback(self, conversation_id: int, tipo: str, detalhes: str = None):
+        """Registra feedback do usuário."""
+        return self.sistema_feedback.registrar_feedback(conversation_id, tipo, detalhes)
+    
+    def registrar_correcao(self, conversation_id: int, resposta_correta: str):
+        """Registra correção do usuário."""
+        return self.sistema_feedback.registrar_correcao(conversation_id, resposta_correta)
+    
+    def obter_taxa_satisfacao(self, user_id: int = None):
+        """Retorna taxa de satisfação."""
+        return self.sistema_feedback.calcular_taxa_satisfacao(user_id)
