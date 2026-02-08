@@ -672,12 +672,84 @@ class SistemaAprendizadoAvancado:
         except Exception as e:
             logger.error(f"Erro ao carregar modelos: {str(e)}")
 
+    def aprender_padrao(self, pergunta: str, resposta: str, qualidade: float):
+        """
+        Aprende padrões de pergunta-resposta bem sucedidas.
+        """
+        if qualidade < 0.7:  # Só aprende de boas respostas
+            return
+        
+        # Normaliza pergunta para detectar padrões
+        from bot.utils.text_utils import normalizar_texto
+        pergunta_norm = normalizar_texto(pergunta)
+        
+        # Armazena padrão
+        if pergunta_norm not in self.padroes_pergunta_resposta:
+            self.padroes_pergunta_resposta[pergunta_norm] = {
+                "resposta": resposta,
+                "qualidade": qualidade,
+                "usos": 1,
+                "ultima_atualizacao": datetime.now()
+            }
+        else:
+            # Atualiza padrão existente se nova resposta for melhor
+            padrao = self.padroes_pergunta_resposta[pergunta_norm]
+            if qualidade > padrao["qualidade"]:
+                padrao["resposta"] = resposta
+                padrao["qualidade"] = qualidade
+            padrao["usos"] += 1
+            padrao["ultima_atualizacao"] = datetime.now()
+
+    def buscar_resposta_aprendida(self, pergunta: str) -> Tuple[str, float]:
+        """
+        Busca se já tem resposta aprendida para pergunta similar.
+        """
+        from bot.utils.text_utils import normalizar_texto
+        from sklearn.feature_extraction.text import TfidfVectorizer
+        from sklearn.metrics.pairwise import cosine_similarity
+
+        pergunta_norm = normalizar_texto(pergunta)
+
+        # Busca exata
+        if pergunta_norm in self.padroes_pergunta_resposta:
+            padrao = self.padroes_pergunta_resposta[pergunta_norm]
+            logger.info(f"Resposta aprendida encontrada (exata): qualidade={padrao['qualidade']:.2f}")
+            return padrao["resposta"], padrao["qualidade"]
+
+        # Busca por similaridade
+        if not self.padroes_pergunta_resposta:
+            return None, 0.0
+
+        try:
+            perguntas_conhecidas = list(self.padroes_pergunta_resposta.keys())
+            todas_perguntas = perguntas_conhecidas + [pergunta_norm]
+
+            vectorizer = TfidfVectorizer()
+            tfidf_matrix = vectorizer.fit_transform(todas_perguntas)
+
+            # Similaridade com última pergunta (nova)
+            similaridades = cosine_similarity(tfidf_matrix[-1], tfidf_matrix[:-1])[0]
+
+            # Pega mais similar
+            idx_max = similaridades.argmax()
+            max_sim = similaridades[idx_max]
+
+            if max_sim > 0.85:  # Muito similar
+                pergunta_similar = perguntas_conhecidas[idx_max]
+                padrao = self.padroes_pergunta_resposta[pergunta_similar]
+                logger.info(f"Resposta aprendida encontrada (similar {max_sim:.2f}): qualidade={padrao['qualidade']:.2f}")
+                return padrao["resposta"], padrao["qualidade"]
+
+        except Exception as e:
+            logger.error(f"Erro ao buscar resposta aprendida: {str(e)}")
+        
+        return None, 0.0
+
     def retreinar_tudo(self):
         """Retreina todos os modelos."""
         logger.info("=" * 60)
         logger.info("RETREINAMENTO COMPLETO")
         logger.info("=" * 60)
-
         self.treinar_detector_intencao_ensemble()
         self.treinar_ranqueador_fontes()
         self.treinar_topic_model()
