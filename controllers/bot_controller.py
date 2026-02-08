@@ -325,6 +325,293 @@ def clear_history():
             "message": str(e)
         }), 500
 
+@bot_bp.route('/feedback', methods=['POST'])
+def register_feedback():
+    """
+    Registra feedback do usuário sobre uma resposta.
+
+    Request Body:
+        {
+            "conversation_id": 123,
+            "tipo": "positivo",  // "positivo", "negativo" ou "neutro"
+            "detalhes": "Resposta muito útil!"  // opcional
+        }
+
+    Response:
+        {
+            "status": "success",
+            "message": "Feedback registrado com sucesso"
+        }
+    """
+    try:
+        data = request.get_json()
+
+        if not data:
+            return jsonify({"error": "JSON inválido"}), 400
+
+        conversation_id = data.get("conversation_id")
+        tipo_feedback = data.get("tipo")
+        detalhes = data.get("detalhes")
+
+        if not conversation_id or not tipo_feedback:
+            return jsonify({
+                "error": "Campos 'conversation_id' e 'tipo' são obrigatórios"
+            }), 400
+
+        if tipo_feedback not in ["positivo", "negativo", "neutro"]:
+            return jsonify({
+                "error": "Tipo de feedback deve ser 'positivo', 'negativo' ou 'neutro'"
+            }), 400
+
+        # Registra feedback
+        sucesso = bot_worker.registrar_feedback(
+            conversation_id, 
+            tipo_feedback, 
+            detalhes
+        )
+
+        if sucesso:
+            return jsonify({
+                "status": "success",
+                "message": "Feedback registrado com sucesso"
+            }), 200
+        else:
+            return jsonify({
+                "status": "error",
+                "message": "Falha ao registrar feedback"
+            }), 400
+
+    except Exception as e:
+        logger.error(f"Erro no endpoint /feedback: {str(e)}", exc_info=True)
+        return jsonify({
+            "error": "Erro interno do servidor",
+            "message": str(e)
+        }), 500
+
+
+@bot_bp.route('/feedback/correcao', methods=['POST'])
+def register_correction():
+    """
+    Registra correção quando a resposta do bot está errada.
+
+    Request Body:
+        {
+            "conversation_id": 123,
+            "resposta_correta": "A resposta correta é..."
+        }
+
+    Response:
+        {
+            "status": "success",
+            "message": "Correção registrada com sucesso"
+        }
+    """
+    try:
+        data = request.get_json()
+
+        if not data:
+            return jsonify({"error": "JSON inválido"}), 400
+
+        conversation_id = data.get("conversation_id")
+        resposta_correta = data.get("resposta_correta")
+
+        if not conversation_id or not resposta_correta:
+            return jsonify({
+                "error": "Campos 'conversation_id' e 'resposta_correta' são obrigatórios"
+            }), 400
+
+        # Registra correção
+        sucesso = bot_worker.registrar_correcao(
+            conversation_id, 
+            resposta_correta
+        )
+
+        if sucesso:
+            return jsonify({
+                "status": "success",
+                "message": "Correção registrada com sucesso"
+            }), 200
+        else:
+            return jsonify({
+                "status": "error",
+                "message": "Falha ao registrar correção"
+            }), 400
+
+    except Exception as e:
+        logger.error(f"Erro no endpoint /feedback/correcao: {str(e)}", exc_info=True)
+        return jsonify({
+            "error": "Erro interno do servidor",
+            "message": str(e)
+        }), 500
+
+
+@bot_bp.route('/feedback/taxa-satisfacao', methods=['GET'])
+def get_satisfaction_rate():
+    """
+    Retorna taxa de satisfação baseada nos feedbacks.
+
+    Query Params:
+        - user_id (int, opcional): Se fornecido, retorna taxa do usuário específico
+
+    Response:
+        {
+            "status": "success",
+            "taxa_satisfacao": 85.5,
+            "total": 100,
+            "positivos": 85,
+            "negativos": 10,
+            "neutros": 5
+        }
+    """
+    try:
+        user_id = request.args.get('user_id', type=int)
+
+        resultado = bot_worker.obter_taxa_satisfacao(user_id)
+
+        return jsonify({
+            "status": "success",
+            **resultado
+        }), 200
+
+    except Exception as e:
+        logger.error(f"Erro no endpoint /feedback/taxa-satisfacao: {str(e)}", exc_info=True)
+        return jsonify({
+            "error": "Erro interno do servidor",
+            "message": str(e)
+        }), 500
+
+
+# ================================
+# ENDPOINTS DE ADMINISTRAÇÃO/ML
+# ================================
+
+@bot_bp.route('/admin/retrain', methods=['POST'])
+def retrain_models():
+    """
+    Retreina os modelos de ML com dados mais recentes.
+    ATENÇÃO: Endpoint administrativo - requer autenticação em produção!
+
+    Response:
+        {
+            "status": "success",
+            "message": "Modelos retreinados com sucesso"
+        }
+    """
+    try:
+        # TODO: Adicionar autenticação de admin aqui
+
+        # Retreina modelos
+        bot_worker.sistema_aprendizado.retreinar_periodicamente()
+
+        return jsonify({
+            "status": "success",
+            "message": "Modelos retreinados com sucesso"
+        }), 200
+
+    except Exception as e:
+        logger.error(f"Erro no endpoint /admin/retrain: {str(e)}", exc_info=True)
+        return jsonify({
+            "error": "Erro interno do servidor",
+            "message": str(e)
+        }), 500
+
+
+@bot_bp.route('/admin/stats/fontes', methods=['GET'])
+def get_sources_statistics():
+    """
+    Retorna estatísticas de desempenho das fontes de dados.
+    ATENÇÃO: Endpoint administrativo - requer autenticação em produção!
+
+    Response:
+        {
+            "status": "success",
+            "stats_fontes": {
+                "wolfram": {
+                    "total_usos": 150,
+                    "sucessos": 145,
+                    "falhas": 5,
+                    "tempo_medio": 1.23,
+                    "score_qualidade": 0.87
+                },
+                ...
+            }
+        }
+    """
+    try:
+        # TODO: Adicionar autenticação de admin aqui
+
+        stats = dict(bot_worker.sistema_aprendizado.stats_fontes)
+
+        return jsonify({
+            "status": "success",
+            "stats_fontes": stats
+        }), 200
+
+    except Exception as e:
+        logger.error(f"Erro no endpoint /admin/stats/fontes: {str(e)}", exc_info=True)
+        return jsonify({
+            "error": "Erro interno do servidor",
+            "message": str(e)
+        }), 500
+
+
+@bot_bp.route('/admin/padroes-aprendidos', methods=['GET'])
+def get_learned_patterns():
+    """
+    Retorna padrões de perguntas-respostas aprendidos.
+    ATENÇÃO: Endpoint administrativo - requer autenticação em produção!
+
+    Query Params:
+        - limit (int, opcional): Número máximo de padrões (default: 50)
+
+    Response:
+        {
+            "status": "success",
+            "total_padroes": 150,
+            "padroes": [
+                {
+                    "pergunta": "qual capital frança",
+                    "resposta": "Paris é...",
+                    "qualidade": 0.95,
+                    "usos": 10
+                },
+                ...
+            ]
+        }
+    """
+    try:
+        # TODO: Adicionar autenticação de admin aqui
+
+        limit = request.args.get('limit', default=50, type=int)
+
+        padroes = bot_worker.sistema_aprendizado.padroes_pergunta_resposta
+
+        # Converte para lista ordenada por qualidade
+        padroes_lista = []
+        for pergunta, dados in padroes.items():
+            padroes_lista.append({
+                "pergunta": pergunta,
+                "resposta": dados["resposta"][:100] + "..." if len(dados["resposta"]) > 100 else dados["resposta"],
+                "qualidade": dados["qualidade"],
+                "usos": dados["usos"],
+                "ultima_atualizacao": dados["ultima_atualizacao"].isoformat()
+            })
+
+        # Ordena por qualidade
+        padroes_lista.sort(key=lambda x: x["qualidade"], reverse=True)
+
+        return jsonify({
+            "status": "success",
+            "total_padroes": len(padroes_lista),
+            "padroes": padroes_lista[:limit]
+        }), 200
+
+    except Exception as e:
+        logger.error(f"Erro no endpoint /admin/padroes-aprendidos: {str(e)}", exc_info=True)
+        return jsonify({
+            "error": "Erro interno do servidor",
+            "message": str(e)
+        }), 500
 
 @bot_bp.route('/health', methods=['GET'])
 def health_check():

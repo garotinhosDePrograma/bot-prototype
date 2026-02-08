@@ -1,8 +1,3 @@
-"""
-Aplicação Flask - Bot Worker API
-Servidor de API para chatbot inteligente com busca em múltiplas fontes
-"""
-
 from flask import Flask, jsonify
 from flask_cors import CORS
 import logging
@@ -35,15 +30,11 @@ app.register_blueprint(user_bp)
 
 logger.info("Blueprints registrados: bot, user")
 
-
 @app.route('/')
 def index():
-    """
-    Rota raiz - Informações da API
-    """
     return jsonify({
         "service": "Bot Worker API",
-        "version": "2.0.0",
+        "version": "1.0.0",
         "status": "online",
         "endpoints": {
             "bot": "/api/bot/*",
@@ -62,7 +53,7 @@ def health():
     return jsonify({
         "status": "healthy",
         "service": "Bot Worker API",
-        "database": "connected"  # Pode adicionar verificação real do DB aqui
+        "database": "connected"
     }), 200
 
 
@@ -72,7 +63,7 @@ def docs():
     Documentação simplificada da API
     """
     return jsonify({
-        "api_version": "2.0.0",
+        "api_version": "1.0.0",
         "documentation": {
             "bot_endpoints": {
                 "POST /api/bot/question": "Faz uma pergunta ao bot",
@@ -128,5 +119,5 @@ if __name__ == "__main__":
     app.run(
         host="0.0.0.0",
         port=5000,
-        debug=False  # Em produção, sempre False
+        debug=False
     )

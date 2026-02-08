@@ -13,6 +13,8 @@ replit.nix
 .upm/
 .pythonlibs/
 
+teste.py
+
 venv/
 node_modules/
 __pycache__/
