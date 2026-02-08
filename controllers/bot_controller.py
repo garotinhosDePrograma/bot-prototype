@@ -3,7 +3,7 @@ Bot Controller - Rotas da API para o bot
 """
 
 from flask import Blueprint, jsonify, request
-from bot.bot_worker import BotWorker
+from bot.bot_worker_v2 import BotWorkerV2
 import logging
 
 logger = logging.getLogger(__name__)
@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 bot_bp = Blueprint('bot', __name__, url_prefix="/api/bot")
 
 # Instância única do worker
-bot_worker = BotWorker()
+bot_worker = BotWorkerV2()
 
 
 @bot_bp.route('/question', methods=['POST'])
@@ -480,136 +480,422 @@ def get_satisfaction_rate():
             "message": str(e)
         }), 500
 
-
 # ================================
-# ENDPOINTS DE ADMINISTRAÇÃO/ML
+# ENDPOINTS ADMINISTRATIVOS V2
 # ================================
 
-@bot_bp.route('/admin/retrain', methods=['POST'])
-def retrain_models():
+@bot_bp.route('/admin/retrain-all', methods=['POST'])
+def retrain_all_models():
     """
-    Retreina os modelos de ML com dados mais recentes.
-    ATENÇÃO: Endpoint administrativo - requer autenticação em produção!
+    Retreina TODOS os modelos ML (ensemble + ranqueador + LDA).
+
+    ⚠️ ADMIN ONLY - Adicionar autenticação!
 
     Response:
         {
             "status": "success",
-            "message": "Modelos retreinados com sucesso"
-        }
-    """
-    try:
-        # TODO: Adicionar autenticação de admin aqui
-
-        # Retreina modelos
-        bot_worker.sistema_aprendizado.retreinar_periodicamente()
-
-        return jsonify({
-            "status": "success",
-            "message": "Modelos retreinados com sucesso"
-        }), 200
-
-    except Exception as e:
-        logger.error(f"Erro no endpoint /admin/retrain: {str(e)}", exc_info=True)
-        return jsonify({
-            "error": "Erro interno do servidor",
-            "message": str(e)
-        }), 500
-
-
-@bot_bp.route('/admin/stats/fontes', methods=['GET'])
-def get_sources_statistics():
-    """
-    Retorna estatísticas de desempenho das fontes de dados.
-    ATENÇÃO: Endpoint administrativo - requer autenticação em produção!
-
-    Response:
-        {
-            "status": "success",
-            "stats_fontes": {
-                "wolfram": {
-                    "total_usos": 150,
-                    "sucessos": 145,
-                    "falhas": 5,
-                    "tempo_medio": 1.23,
-                    "score_qualidade": 0.87
-                },
-                ...
+            "message": "Modelos retreinados",
+            "detalhes": {
+                "intencao_ensemble": true,
+                "ranqueador_fontes": true,
+                "topic_model": true
             }
         }
     """
     try:
-        # TODO: Adicionar autenticação de admin aqui
+        # TODO: Adicionar autenticação
 
-        stats = dict(bot_worker.sistema_aprendizado.stats_fontes)
+        logger.info("=" * 60)
+        logger.info("RETREINAMENTO COMPLETO SOLICITADO")
+        logger.info("=" * 60)
+
+        bot_worker.sistema_ml.retreinar_tudo()
 
         return jsonify({
             "status": "success",
-            "stats_fontes": stats
+            "message": "Todos os modelos retreinados com sucesso",
+            "detalhes": {
+                "intencao_ensemble": True,
+                "ranqueador_fontes": True,
+                "topic_model": True
+            }
         }), 200
 
     except Exception as e:
-        logger.error(f"Erro no endpoint /admin/stats/fontes: {str(e)}", exc_info=True)
+        logger.error(f"Erro no retreinamento: {str(e)}", exc_info=True)
         return jsonify({
-            "error": "Erro interno do servidor",
+            "error": "Erro ao retreinar modelos",
             "message": str(e)
         }), 500
 
 
-@bot_bp.route('/admin/padroes-aprendidos', methods=['GET'])
-def get_learned_patterns():
+@bot_bp.route('/admin/topics', methods=['GET'])
+def get_topics():
     """
-    Retorna padrões de perguntas-respostas aprendidos.
-    ATENÇÃO: Endpoint administrativo - requer autenticação em produção!
+    Lista tópicos descobertos pelo LDA.
 
-    Query Params:
-        - limit (int, opcional): Número máximo de padrões (default: 50)
+    ⚠️ ADMIN ONLY - Adicionar autenticação!
 
     Response:
         {
             "status": "success",
-            "total_padroes": 150,
-            "padroes": [
+            "n_topics": 20,
+            "topics": [
                 {
-                    "pergunta": "qual capital frança",
-                    "resposta": "Paris é...",
-                    "qualidade": 0.95,
-                    "usos": 10
+                    "id": 0,
+                    "top_words": ["brasil", "capital", "país"],
+                    "weight": 0.15
                 },
                 ...
             ]
         }
     """
     try:
-        # TODO: Adicionar autenticação de admin aqui
+        # TODO: Adicionar autenticação
 
-        limit = request.args.get('limit', default=50, type=int)
+        if not bot_worker.sistema_ml.lda_model:
+            return jsonify({
+                "status": "error",
+                "message": "Modelo LDA não treinado ainda"
+            }), 400
 
-        padroes = bot_worker.sistema_aprendizado.padroes_pergunta_resposta
+        lda = bot_worker.sistema_ml.lda_model
+        vectorizer = bot_worker.sistema_ml.lda_vectorizer
 
-        # Converte para lista ordenada por qualidade
-        padroes_lista = []
-        for pergunta, dados in padroes.items():
-            padroes_lista.append({
-                "pergunta": pergunta,
-                "resposta": dados["resposta"][:100] + "..." if len(dados["resposta"]) > 100 else dados["resposta"],
-                "qualidade": dados["qualidade"],
-                "usos": dados["usos"],
-                "ultima_atualizacao": dados["ultima_atualizacao"].isoformat()
+        if not vectorizer:
+            return jsonify({
+                "status": "error",
+                "message": "Vectorizer não disponível"
+            }), 400
+
+        feature_names = vectorizer.get_feature_names_out()
+
+        topics = []
+        for topic_idx, topic in enumerate(lda.components_):
+            # Top 10 palavras
+            top_indices = topic.argsort()[-10:][::-1]
+            top_words = [feature_names[i] for i in top_indices]
+            weight = topic.sum() / lda.components_.sum()
+
+            topics.append({
+                "id": topic_idx,
+                "top_words": top_words,
+                "weight": round(weight, 4)
             })
-
-        # Ordena por qualidade
-        padroes_lista.sort(key=lambda x: x["qualidade"], reverse=True)
 
         return jsonify({
             "status": "success",
-            "total_padroes": len(padroes_lista),
-            "padroes": padroes_lista[:limit]
+            "n_topics": len(topics),
+            "topics": topics
         }), 200
 
     except Exception as e:
-        logger.error(f"Erro no endpoint /admin/padroes-aprendidos: {str(e)}", exc_info=True)
+        logger.error(f"Erro ao buscar tópicos: {str(e)}", exc_info=True)
         return jsonify({
-            "error": "Erro interno do servidor",
+            "error": "Erro ao buscar tópicos",
+            "message": str(e)
+        }), 500
+
+
+@bot_bp.route('/admin/stats/fontes-avancadas', methods=['GET'])
+def get_advanced_source_stats():
+    """
+    Estatísticas avançadas de cada fonte.
+
+    ⚠️ ADMIN ONLY - Adicionar autenticação!
+
+    Response:
+        {
+            "status": "success",
+            "fontes": {
+                "wolfram": {
+                    "total_usos": 150,
+                    "taxa_sucesso": 0.967,
+                    "tempo_medio": 1.23,
+                    "score_qualidade": 0.87,
+                    "tipos_pergunta_boas": {
+                        "quanto": 45,
+                        "qual": 30
+                    },
+                    "topicos_bons": {
+                        "1": 50,
+                        "5": 30
+                    }
+                },
+                ...
+            }
+        }
+    """
+    try:
+        # TODO: Adicionar autenticação
+
+        stats_fontes = {}
+
+        for fonte, stats in bot_worker.sistema_ml.stats_fontes.items():
+            stats_fontes[fonte] = {
+                "total_usos": stats["total_usos"],
+                "sucessos": stats["sucessos"],
+                "falhas": stats["falhas"],
+                "taxa_sucesso": round(stats["taxa_sucesso"], 3),
+                "tempo_medio": round(stats["tempo_medio"], 2),
+                "score_qualidade": round(stats["score_qualidade"], 3),
+                "taxa_feedback_positivo": round(stats.get("taxa_feedback_positivo", 0.5), 3),
+                "tipos_pergunta_boas": dict(stats["tipos_pergunta_boas"].most_common(5)),
+                "topicos_bons": {str(k): v for k, v in stats["topicos_bons"].most_common(5)},
+                "ultimo_scores": stats["historico_scores"][-10:] if stats["historico_scores"] else []
+            }
+
+        return jsonify({
+            "status": "success",
+            "fontes": stats_fontes
+        }), 200
+
+    except Exception as e:
+        logger.error(f"Erro ao buscar stats avançadas: {str(e)}", exc_info=True)
+        return jsonify({
+            "error": "Erro ao buscar estatísticas",
+            "message": str(e)
+        }), 500
+
+
+@bot_bp.route('/admin/model-performance', methods=['GET'])
+def get_model_performance():
+    """
+    Performance de cada modelo do ensemble.
+
+    ⚠️ ADMIN ONLY - Adicionar autenticação!
+
+    Response:
+        {
+            "status": "success",
+            "models": {
+                "naive_bayes": {"trained": true},
+                "random_forest": {"trained": true},
+                "gradient_boosting": {"trained": true},
+                "lstm": {"trained": false}
+            }
+        }
+    """
+    try:
+        # TODO: Adicionar autenticação
+
+        ml_system = bot_worker.sistema_ml
+
+        models = {
+            "naive_bayes": {
+                "trained": ml_system.modelo_intencao_nb is not None,
+                "type": "MultinomialNB"
+            },
+            "random_forest": {
+                "trained": ml_system.modelo_intencao_rf is not None,
+                "type": "RandomForestClassifier"
+            },
+            "gradient_boosting": {
+                "trained": ml_system.modelo_intencao_gb is not None,
+                "type": "GradientBoostingClassifier"
+            },
+            "lstm": {
+                "trained": ml_system.modelo_intencao_lstm is not None,
+                "type": "LSTM Deep Learning"
+            },
+            "ranqueador_fontes": {
+                "trained": ml_system.modelo_ranqueamento_fontes is not None,
+                "type": "RandomForestClassifier"
+            },
+            "lda_topics": {
+                "trained": ml_system.lda_model is not None,
+                "type": "LatentDirichletAllocation",
+                "n_topics": ml_system.lda_model.n_components if ml_system.lda_model else 0
+            }
+        }
+
+        return jsonify({
+            "status": "success",
+            "models": models,
+            "ensemble_ready": all([
+                models["naive_bayes"]["trained"],
+                models["random_forest"]["trained"],
+                models["gradient_boosting"]["trained"]
+            ])
+        }), 200
+
+    except Exception as e:
+        logger.error(f"Erro ao buscar performance: {str(e)}", exc_info=True)
+        return jsonify({
+            "error": "Erro ao buscar performance dos modelos",
+            "message": str(e)
+        }), 500
+
+
+@bot_bp.route('/admin/fontes/ranking', methods=['POST'])
+def get_fonte_ranking():
+    """
+    Ranqueia fontes para uma pergunta específica.
+
+    ⚠️ ADMIN ONLY - Adicionar autenticação!
+
+    Request:
+        {
+            "pergunta": "Qual a capital da França?"
+        }
+
+    Response:
+        {
+            "status": "success",
+            "pergunta": "Qual a capital da França?",
+            "ranking": [
+                {"fonte": "wikipedia", "score": 0.89},
+                {"fonte": "google", "score": 0.72},
+                {"fonte": "wolfram", "score": 0.45}
+            ]
+        }
+    """
+    try:
+        # TODO: Adicionar autenticação
+
+        data = request.get_json()
+
+        if not data or "pergunta" not in data:
+            return jsonify({
+                "error": "Campo 'pergunta' é obrigatório"
+            }), 400
+
+        pergunta = data["pergunta"]
+
+        # Pega todas as fontes disponíveis
+        fontes = list(bot_worker.buscador.fontes_disponiveis.keys())
+
+        # Ranqueia
+        ranking = bot_worker.sistema_ml.ranquear_fontes_inteligente(pergunta, fontes)
+
+        return jsonify({
+            "status": "success",
+            "pergunta": pergunta,
+            "ranking": [
+                {"fonte": fonte, "score": round(score, 3)}
+                for fonte, score in ranking
+            ]
+        }), 200
+
+    except Exception as e:
+        logger.error(f"Erro ao ranquear fontes: {str(e)}", exc_info=True)
+        return jsonify({
+            "error": "Erro ao ranquear fontes",
+            "message": str(e)
+        }), 500
+
+
+@bot_bp.route('/admin/predict-intent', methods=['POST'])
+def predict_intent_ensemble():
+    """
+    Prevê intenção usando ensemble para uma pergunta.
+
+    ⚠️ ADMIN ONLY - Útil para debug!
+
+    Request:
+        {
+            "pergunta": "Oi, tudo bem?"
+        }
+
+    Response:
+        {
+            "status": "success",
+            "pergunta": "Oi, tudo bem?",
+            "intencao": "saudacao",
+            "confianca": 0.95
+        }
+    """
+    try:
+        # TODO: Adicionar autenticação
+
+        data = request.get_json()
+
+        if not data or "pergunta" not in data:
+            return jsonify({
+                "error": "Campo 'pergunta' é obrigatório"
+            }), 400
+
+        pergunta = data["pergunta"]
+
+        # Prevê intenção
+        intencao, confianca = bot_worker.sistema_ml.prever_intencao_ensemble(pergunta)
+
+        return jsonify({
+            "status": "success",
+            "pergunta": pergunta,
+            "intencao": intencao,
+            "confianca": round(confianca, 3)
+        }), 200
+
+    except Exception as e:
+        logger.error(f"Erro ao prever intenção: {str(e)}", exc_info=True)
+        return jsonify({
+            "error": "Erro ao prever intenção",
+            "message": str(e)
+        }), 500
+
+
+@bot_bp.route('/admin/detect-topic', methods=['POST'])
+def detect_topic():
+    """
+    Detecta tópico de uma pergunta.
+
+    ⚠️ ADMIN ONLY
+
+    Request:
+        {
+            "pergunta": "Qual a capital do Brasil?"
+        }
+
+    Response:
+        {
+            "status": "success",
+            "pergunta": "Qual a capital do Brasil?",
+            "topico": 5,
+            "top_words": ["brasil", "capital", "país"]
+        }
+    """
+    try:
+        # TODO: Adicionar autenticação
+
+        data = request.get_json()
+
+        if not data or "pergunta" not in data:
+            return jsonify({
+                "error": "Campo 'pergunta' é obrigatório"
+            }), 400
+
+        pergunta = data["pergunta"]
+
+        # Detecta tópico
+        topico = bot_worker.sistema_ml.detectar_topico(pergunta)
+
+        if topico < 0:
+            return jsonify({
+                "status": "error",
+                "message": "Modelo LDA não treinado"
+            }), 400
+
+        # Pega palavras do tópico
+        lda = bot_worker.sistema_ml.lda_model
+        vectorizer = bot_worker.sistema_ml.lda_vectorizer
+
+        feature_names = vectorizer.get_feature_names_out()
+        topic_words = lda.components_[topico]
+        top_indices = topic_words.argsort()[-10:][::-1]
+        top_words = [feature_names[i] for i in top_indices]
+
+        return jsonify({
+            "status": "success",
+            "pergunta": pergunta,
+            "topico": topico,
+            "top_words": top_words
+        }), 200
+
+    except Exception as e:
+        logger.error(f"Erro ao detectar tópico: {str(e)}", exc_info=True)
+        return jsonify({
+            "error": "Erro ao detectar tópico",
             "message": str(e)
         }), 500
 
