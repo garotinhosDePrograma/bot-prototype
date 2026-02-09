@@ -527,6 +527,25 @@ def retrain_all_models():
             "message": str(e)
         }), 500
 
+@bot_bp.route('/admin/reload-models', methods=['POST'])
+def reload_models():
+    """
+    Recarrega modelos sem reiniciar servidor.
+    Útil após retreinamento.
+    """
+    try:
+        bot_worker = get_bot_worker()
+        bot_worker.sistema_ml.carregar_modelos()
+        
+        return jsonify({
+            "status": "success",
+            "message": "Modelos recarregados com sucesso"
+        }), 200
+    except Exception as e:
+        logger.error(f"Erro ao recarregar modelos: {str(e)}")
+        return jsonify({
+            "error": str(e)
+        }), 500
 
 @bot_bp.route('/admin/topics', methods=['GET'])
 def get_topics():
