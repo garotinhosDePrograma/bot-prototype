@@ -932,7 +932,7 @@ def health_check():
                 "ensemble_rf": ml.modelo_intencao_rf is not None,
                 "ensemble_gb": ml.modelo_intencao_gb is not None,
                 "lstm": ml.modelo_intencao_lstm is not None,
-                "ranqueador": ml.modelo_ranqueamento_fonte is not None,
+                "ranqueador": ml.modelo_ranqueamento_fontes is not None,
                 "lda": ml.lda_model is not None
             },
             "cache_size": len(cache),
