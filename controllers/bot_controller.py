@@ -4,6 +4,7 @@ Bot Controller - Rotas da API para o bot
 
 from flask import Blueprint, jsonify, request
 from bot.bot_worker_v2 import get_bot_worker
+from bot.utils.production_config import MODO_PRODUCAO, DEEP_LEARNING_AVAILABLE
 import logging
 
 logger = logging.getLogger(__name__)
