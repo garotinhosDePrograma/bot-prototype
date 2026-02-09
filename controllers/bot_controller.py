@@ -931,7 +931,7 @@ def health_check():
                 "ensemble_nb": ml.modelo_intencao_nb is not None,
                 "ensemble_rf": ml.modelo_intencao_rf is not None,
                 "ensemble_gb": ml.modelo_intencao_gb is not None,
-                "lstm": ml.modelo_intencao_lstml is not None,
+                "lstm": ml.modelo_intencao_lstm is not None,
                 "ranqueador": ml.modelo_ranqueamento_fonte is not None,
                 "lda": ml.lda_model is not None
             },
