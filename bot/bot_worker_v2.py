@@ -31,6 +31,7 @@ cache = TTLCache(maxsize=200, ttl=3600)  # Aumentado para 200
 # Contexto da conversa
 contexto = []
 
+_bot_worker_instance = None
 
 class BotWorkerV2:
     """
@@ -415,3 +416,10 @@ class BotWorkerV2:
 
     def obter_taxa_satisfacao(self, user_id=None):
         return self.sistema_feedback.calcular_taxa_satisfacao(user_id)
+
+    
+def get_bot_worker():
+    global _bot_worker_instance
+    if _bot_worker_instance is None:
+        _bot_worker_instance = BotWorkerV2()
+    return _bot_worker_instance

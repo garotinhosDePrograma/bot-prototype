@@ -12,6 +12,8 @@ from datetime import datetime, timedelta
 from collections import defaultdict, Counter
 from pathlib import Path
 
+from bot.utils.production_config import MODO_PRODUCAO, DEEP_LEARNING_AVAILABLE
+
 # Machine Learning - Clássico
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.naive_bayes import MultinomialNB
@@ -21,24 +23,25 @@ from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import accuracy_score, f1_score, classification_report
 from sklearn.preprocessing import LabelEncoder
 
-# Deep Learning (opcional - instalar: pip install tensorflow keras)
-try:
-    from tensorflow import keras
-    from keras.models import Sequential, load_model
-    from keras.layers import Dense, Embedding, LSTM, Dropout, Bidirectional
-    from keras.preprocessing.text import Tokenizer
-    from keras.preprocessing.sequence import pad_sequences
-    DEEP_LEARNING_AVAILABLE = True
-except ImportError:
-    DEEP_LEARNING_AVAILABLE = False
-    logging.warning("TensorFlow/Keras não disponível - usando apenas modelos clássicos")
-
 # NLP Avançado
 import spacy
 from sklearn.decomposition import LatentDirichletAllocation
 
 logger = logging.getLogger(__name__)
 
+if not MODO_PRODUCAO:
+    try:
+        from tensorflow import keras
+        from keras.models import Sequential, load_model
+        from keras.layers import Dense, Embedding, LSTM, Dropout, Bidirectional
+        from keras.preprocessing.text import Tokenizer
+        from keras.preprocessing.sequence import pad_sequences
+        DEEP_LEARNING_AVAILABLE = True
+    except ImportError:
+         DEEP_LEARNING_AVAILABLE = False
+else:
+    DEEP_LEARNING_AVAILABLE = False
+    logger.info("Deep Learning desabilitado (modo produção)")
 
 class SistemaAprendizadoAvancado:
     """
@@ -75,7 +78,9 @@ class SistemaAprendizadoAvancado:
 
         # NLP
         try:
-            self.nlp = spacy.load("pt_core_news_sm")
+            from bot.utils.production_config import SPACY_PIPELINE_DISABLED
+            self.nlp = spacy.load("pt_core_news_sm", disable=SPACY_PIPELINE_DISABLED)
+            logger.info(f"spaCy carregado (disabled: {SPACY_PIPELINE_DISABLED})")
         except:
             self.nlp = None
             logger.warning("spaCy não disponível")

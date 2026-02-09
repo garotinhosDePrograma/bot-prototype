@@ -3,7 +3,7 @@ Bot Controller - Rotas da API para o bot
 """
 
 from flask import Blueprint, jsonify, request
-from bot.bot_worker_v2 import BotWorkerV2
+from bot.bot_worker_v2 import get_bot_worker
 import logging
 
 logger = logging.getLogger(__name__)
@@ -11,8 +11,7 @@ logger = logging.getLogger(__name__)
 bot_bp = Blueprint('bot', __name__, url_prefix="/api/bot")
 
 # Instância única do worker
-bot_worker = BotWorkerV2()
-
+bot_worker = get_bot_worker()
 
 @bot_bp.route('/question', methods=['POST'])
 def question():
