@@ -3,7 +3,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-MODO_PRODUCAO = os.getenv("PRODUCAO", "false").lower == "true"
+MODO_PRODUCAO = os.getenv("PRODUCAO").lower == "true"
 
 if MODO_PRODUCAO:
     DEEP_LEARNING_AVAILABLE = False
