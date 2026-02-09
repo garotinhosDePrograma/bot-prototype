@@ -114,6 +114,19 @@ class SistemaAprendizadoAvancado:
     # TREINAMENTO - ENSEMBLE DE CLASSIFICADORES
     # ============================================
 
+    def inferir_intencao_basica(pergunta: str) -> str:
+        p = pergunta.lower()
+
+        if any(x in p for x in ["oi", "olá", "ola", "bom dia", "boa tarde"]):
+            return "saudacao"
+        if any(x in p for x in ["tchau", "até", "adeus"]):
+            return "despedida"
+        if any(x in p for x in ["como funciona", "explique", "o que é"]):
+            return "conceito"
+        if any(x in p for x in ["como", "qual", "quando", "onde"]):
+            return "pergunta"
+        return "conhecimento"
+
     def treinar_detector_intencao_ensemble(self, min_exemplos=50):
         """
         Treina ensemble de modelos para detectar intenção.
@@ -141,7 +154,7 @@ class SistemaAprendizadoAvancado:
             elif conversa.metadata and "tipo_pergunta" in conversa.metadata:
                 intencao = conversa.metadata["tipo_pergunta"]
             else:
-                intencao = "conhecimento"
+                intencao = inferir_intencao_basica(pergunta)
 
             X.append(pergunta)
             y.append(intencao)
