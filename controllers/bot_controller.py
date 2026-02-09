@@ -919,28 +919,23 @@ def detect_topic():
 
 @bot_bp.route('/health', methods=['GET'])
 def health_check():
-    """
-    Health check do bot.
-    
-    Response:
-        {
-            "status": "online",
-            "service": "bot",
-            "cache_size": 10
-        }
-    """
     try:
-        from bot.bot_worker import cache
-        
+        bot_worker = get_bot_worker()
+        ml = bot_worker.sistema_ml
+
         return jsonify({
             "status": "online",
-            "service": "bot",
-            "cache_size": len(cache)
+            "modo_producao": MODO_PRODUCAO,
+            "modelos_carregados": {
+                "ensemble_nb": ml.modelo_intencao_nb is not None,
+                "ensemble_rf": ml.modelo_intencao_rf is not None,
+                "ensemble_gb": ml.modelo_intencao_gb is not None,
+                "lstm": ml.modelo_intencao_lstml is not None,
+                "ranqueador": ml.modelo_ranqueamento_fonte is not None,
+                "lda": ml.lda_model is not None
+            },
+            "cache_size": len(cache),
+            "deep_learning": DEEP_LEARNING_AVAILABLE
         }), 200
-        
     except Exception as e:
-        logger.error(f"Erro no endpoint /health: {str(e)}", exc_info=True)
-        return jsonify({
-            "status": "error",
-            "message": str(e)
-        }), 500
+        return jsonify({"status": "error", "message": str(e)}), 500
