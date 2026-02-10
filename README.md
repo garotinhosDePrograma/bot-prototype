@@ -929,7 +929,6 @@ Encontrou um bug? Tem uma sugestão?
 
 - 🐛 Abra uma [issue](https://github.com/garotinhosDePrograma/bot-prototype/issues)
 - 🔧 Envie um [pull request](https://github.com/garotinhosDePrograma/bot-prototype/pulls)
-- 📧 Email: (adicionar se desejar)
 
 ---
 
@@ -946,15 +945,6 @@ Encontrou um bug? Tem uma sugestão?
 ---
 
 **⭐ Se este projeto foi útil, deixe uma estrela no GitHub!**
-
----
-
-## 📚 Documentação Adicional
-
-- [📊 Análise Técnica Completa](ANALISE_PROJETO.md)
-- [🔧 Guia de Deploy](CHECKLIST_DEPLOY.md)
-- [🧠 ML System Documentation](bot/ml/README.md)
-- [📡 API Reference](docs/API.md)
 
 ---
 
