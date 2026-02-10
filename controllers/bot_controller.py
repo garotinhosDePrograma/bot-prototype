@@ -4,15 +4,12 @@ Bot Controller - Rotas da API para o bot
 
 from flask import Blueprint, jsonify, request
 from bot.bot_worker_v2 import get_bot_worker
-from bot.utils.production_config import MODO_PRODUCAO, DEEP_LEARNING_AVAILABLE
+from bot.utils.production_config import MODO_PRODUCAO, DEEP_LEARNING_AVAILABLE, CACHE_SIZE
 import logging
 
 logger = logging.getLogger(__name__)
 
 bot_bp = Blueprint('bot', __name__, url_prefix="/api/bot")
-
-# Instância única do worker
-bot_worker = get_bot_worker()
 
 @bot_bp.route('/question', methods=['POST'])
 def question():
@@ -36,6 +33,7 @@ def question():
         }
     """
     try:
+        bot_worker = get_bot_worker()
         data = request.get_json()
         
         if not data:
@@ -93,6 +91,8 @@ def get_history():
         }
     """
     try:
+        bot_worker = get_bot_worker()
+        
         user_id = request.args.get('user_id', type=int)
         limit = request.args.get('limit', default=20, type=int)
         offset = request.args.get('offset', default=0, type=int)
@@ -142,6 +142,7 @@ def get_conversation(conversation_id):
         }
     """
     try:
+        bot_worker = get_bot_worker()
         resultado = bot_worker.get_conversation(conversation_id)
         
         status_code = 200 if resultado['status'] == 'success' else 404
@@ -174,6 +175,8 @@ def search_conversations():
         }
     """
     try:
+        bot_worker = get_bot_worker()
+        
         user_id = request.args.get('user_id', type=int)
         query = request.args.get('q', type=str)
         limit = request.args.get('limit', default=20, type=int)
@@ -219,6 +222,7 @@ def delete_conversation(conversation_id):
         }
     """
     try:
+        bot_worker = get_bot_worker()
         data = request.get_json()
         
         if not data:
@@ -269,6 +273,7 @@ def get_statistics():
         }
     """
     try:
+        bot_worker = get_bot_worker()
         user_id = request.args.get('user_id', type=int)
         
         if not user_id:
@@ -304,6 +309,7 @@ def clear_history():
         }
     """
     try:
+        bot_worker = get_bot_worker()
         data = request.get_json()
         
         if not data:
@@ -344,6 +350,7 @@ def register_feedback():
         }
     """
     try:
+        bot_worker = get_bot_worker()
         data = request.get_json()
 
         if not data:
@@ -407,6 +414,7 @@ def register_correction():
         }
     """
     try:
+        bot_worker = get_bot_worker()
         data = request.get_json()
 
         if not data:
@@ -464,6 +472,7 @@ def get_satisfaction_rate():
         }
     """
     try:
+        bot_worker = get_bot_worker()
         user_id = request.args.get('user_id', type=int)
 
         resultado = bot_worker.obter_taxa_satisfacao(user_id)
@@ -509,6 +518,7 @@ def retrain_all_models():
         logger.info("RETREINAMENTO COMPLETO SOLICITADO")
         logger.info("=" * 60)
 
+        bot_worker = get_bot_worker()
         bot_worker.sistema_ml.retreinar_tudo()
 
         return jsonify({
@@ -572,6 +582,8 @@ def get_topics():
     try:
         # TODO: Adicionar autenticação
 
+        bot_worker = get_bot_worker()
+        
         if not bot_worker.sistema_ml.lda_model:
             return jsonify({
                 "status": "error",
@@ -648,6 +660,8 @@ def get_advanced_source_stats():
     try:
         # TODO: Adicionar autenticação
 
+        bot_worker = get_bot_worker()
+        
         stats_fontes = {}
 
         for fonte, stats in bot_worker.sistema_ml.stats_fontes.items():
@@ -698,6 +712,7 @@ def get_model_performance():
     try:
         # TODO: Adicionar autenticação
 
+        bot_worker = get_bot_worker()
         ml_system = bot_worker.sistema_ml
 
         models = {
@@ -772,6 +787,7 @@ def get_fonte_ranking():
     try:
         # TODO: Adicionar autenticação
 
+        bot_worker = get_bot_worker()
         data = request.get_json()
 
         if not data or "pergunta" not in data:
@@ -827,6 +843,7 @@ def predict_intent_ensemble():
     try:
         # TODO: Adicionar autenticação
 
+        bot_worker = get_bot_worker()
         data = request.get_json()
 
         if not data or "pergunta" not in data:
@@ -877,6 +894,7 @@ def detect_topic():
     try:
         # TODO: Adicionar autenticação
 
+        bot_worker = get_bot_worker()
         data = request.get_json()
 
         if not data or "pergunta" not in data:
@@ -935,7 +953,7 @@ def health_check():
                 "ranqueador": ml.modelo_ranqueamento_fontes is not None,
                 "lda": ml.lda_model is not None
             },
-            "cache_size": len(cache),
+            "cache_size": CACHE_SIZE,
             "deep_learning": DEEP_LEARNING_AVAILABLE
         }), 200
     except Exception as e:

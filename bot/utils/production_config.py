@@ -3,7 +3,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-MODO_PRODUCAO = os.getenv("PRODUCAO").lower == "true"
+MODO_PRODUCAO = os.getenv("PRODUCAO", "false").lower() == "true"
 
 if MODO_PRODUCAO:
     DEEP_LEARNING_AVAILABLE = False
@@ -27,6 +27,6 @@ else:
     MAX_FEATURES_TFIDF = 1000
     SPACY_PIPELINE_DISABLED = []
     CACHE_SIZE = 200
-    MAX_FEATURES_TFIDF = 4
+    MAX_WORKERS_BUSCA = 4
 
     logger.info("MODO DESENVOLVIMENTO")
