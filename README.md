@@ -945,7 +945,7 @@ Encontrou um bug? Tem uma sugestão?
 ---
 ## 📚 Documentação adicional
 
-- [📊 Análise Técnica Completa][ANALISE_PROJETO.md]
+- [📊 Análise Técnica Completa](ANALISE_PROJETO.md)
 
 ---
 
