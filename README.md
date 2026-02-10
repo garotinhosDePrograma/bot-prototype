@@ -943,6 +943,11 @@ Encontrou um bug? Tem uma sugestão?
 - **Google** - Custom Search API
 
 ---
+## 📚 Documentação adicional
+
+- [📊 Análise Técnica Completa][ANALISE_PROJETO.md]
+
+---
 
 **⭐ Se este projeto foi útil, deixe uma estrela no GitHub!**
 
