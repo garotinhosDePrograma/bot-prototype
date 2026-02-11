@@ -46,7 +46,7 @@ class BuscadorUnificado:
             "wikipedia": 7,
             "arxiv": 10,
             "dbpedia": 5,
-            "youtube": 15,
+            "youtube": 10,
         }
 
     # ============================================

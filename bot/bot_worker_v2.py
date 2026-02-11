@@ -386,7 +386,33 @@ class BotWorkerV2:
 
     # Métodos do sistema anterior (compatibilidade)
     def get_user_history(self, user_id, limit=20, offset=0):
-        return self.repository.get_user_conversations(user_id, limit, offset)
+        try:
+            conversations = self.repository.get_user_conversations(user_id, limit, offset)
+            total = self.repository.get_total_conversations_count(user_id)
+
+            return {
+                "status": "success",
+                "conversations": [c.to_dict_summary() for c in conversations],
+                "pagination": {
+                    "total": total,
+                    "limit": limit,
+                    "offset": offset,
+                    "has_more": (offset + limit) < total
+                }
+            }
+        except Exception as e:
+            logger.error(f"Erro ao buscar histórico: {str(e)}", exc_info=True)
+            return {
+                "status": "error",
+                "message": str(e),
+                "conversations": [],
+                "pagination": {
+                    "total": 0,
+                    "limit": limit,
+                    "offset": offset,
+                    "has_more": False
+                }
+            }
 
     def get_conversation(self, conversation_id):
         conv = self.repository.get_conversation_by_id(conversation_id)

@@ -1,12 +1,16 @@
 from flask import jsonify
 from repositories.user_repository import UserRepository
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
 import bcrypt
 import jwt
+import os
+
+load_dotenv()
 
 repo = UserRepository()
 
-SECRET_KEY = "TXGKPOYWXGENEISJSIWHRBF"
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 class UserWorker:
     def create(self, nome, email, senha):

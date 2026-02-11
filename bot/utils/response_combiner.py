@@ -32,9 +32,15 @@ class CombinadorRespostas:
             vectorizer = TfidfVectorizer()
             textos = [pergunta.lower(), resposta.lower()]
             tfidf_matrix = vectorizer.fit_transform(textos)
-            similaridade = cosine_similarity(tfidf_matrix[0], tfidf_matrix[1])[0][0]
+
+            if tfidf_matrix.shape[0] >= 2:
+                similaridade = cosine_similarity(tfidf_matrix[0], tfidf_matrix[1])[0][0]
+            else:
+                return 0.0
+            
             return similaridade
-        except:
+        except Exception as e:
+            logger.error(f"Erro ao calcular relevância: {e}")
             return 0.0
 
     def ranquear_respostas(self, respostas: Dict[str, str], pergunta: str) -> List[tuple]:

@@ -164,11 +164,13 @@ class AnalisadorAvancado:
                     # (isso é simplificado - pode ser melhorado)
                     if len(parte2.split()) <= 2:  # Só palavra interrogativa
                         # Pega substantivo da primeira parte
-                        doc_parte1 = self.nlp(partes[0])
-                        substantivos = [t.text for t in doc_parte1 if t.pos_ in ["NOUN", "PROPN"]]
-                        
-                        if substantivos:
-                            parte2 = f"{parte2} {' '.join(substantivos[-2:])}"
+                        try:
+                            doc_parte1 = self.nlp(partes[0])
+                            substantivos = [t.text for t in doc_parte1 if t.pos_ in ["NOUN", "PROPN"]]
+                            if substantivos:
+                                parte2 = f"{parte2} {' '.join(substantivos[-2:])}"
+                        except Exception as e:
+                            logger.error(f"Erro ao processar parte da pergunta: {e}")
                     
                     subperguntas.append(parte2.strip() + "?")
         
